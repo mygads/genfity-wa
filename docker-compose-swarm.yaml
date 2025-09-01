@@ -2,19 +2,19 @@ version: '3.7'
 
 services:
   wa-server:
-    image: setupautomatizado/wuzapi-server:latest
+    image: setupautomatizado/genfity-wa:latest
     networks:
       - network_public
     environment:
       - WA_ADMIN_TOKEN=H4Zbhw72PBKdTIgS
-      - DB_USER=wuzapi
-      - DB_PASSWORD=wuzapi
-      - DB_NAME=wuzapi
+      - DB_USER=genfity
+      - DB_PASSWORD=genfitydbpassword
+      - DB_NAME=wa_db
       - DB_HOST=db
       - DB_PORT=5432
       - TZ=America/Sao_Paulo
       - WEBHOOK_FORMAT=json
-      - SESSION_DEVICE_NAME=WuzAPI
+      - SESSION_DEVICE_NAME=Genfity
     deploy:
       mode: replicated
       replicas: 1

@@ -1,6 +1,6 @@
-# WUZAPI
+# Genfity Wa
 
-<img src="static/favicon.ico" width="30"> WuzAPI is an implementation 
+<img src="static/favicon.ico" width="30"> Genfity Wa is an implementation 
 of the [@tulir/whatsmeow](https://github.com/tulir/whatsmeow) library as a 
 simple RESTful API service with multiple device support and concurrent 
 sessions.
@@ -65,45 +65,45 @@ Example:
 To have colored logs:
 
 ```
-./wuzapi -logtype=console -color=true
+./genfity-wa -logtype=console -color=true
 ```
 
 For JSON logs:
 
 ```
-./wuzapi -logtype json 
+./genfity-wa -logtype json 
 ```
 
 With time zone: 
 
-Set `TZ=America/New_York ./wuzapi ...` in your shell or in your .env file or Docker Compose environment: `TZ=America/New_York`.  
+Set `TZ=America/New_York ./genfity-wa ...` in your shell or in your .env file or Docker Compose environment: `TZ=America/New_York`.  
 
 ## Configuration
 
-WuzAPI uses a <code>.env</code> file for configuration. Here are the required settings:
+Genfity Wa uses a <code>.env</code> file for configuration. Here are the required settings:
 
 ### For PostgreSQL
 ```
-WUZAPI_ADMIN_TOKEN=your_admin_token_here
-DB_USER=wuzapi
-DB_PASSWORD=wuzapi
-DB_NAME=wuzapi
+Genfity_ADMIN_TOKEN=your_admin_token_here
+DB_USER=genfity
+DB_PASSWORD=genfity
+DB_NAME=genfity
 DB_HOST=localhost
 DB_PORT=5432
 DB_SSLMODE=false
 TZ=America/New_York
 WEBHOOK_FORMAT=json # or "form" for the default
-SESSION_DEVICE_NAME=WuzAPI
+SESSION_DEVICE_NAME=genfity
 ```
 
 ### For SQLite
 ```
-WUZAPI_ADMIN_TOKEN=your_admin_token_here
+WA_ADMIN_TOKEN=your_admin_token_here
 TZ=America/New_York
 ```
 
 ### RabbitMQ Integration
-WuzAPI supports sending WhatsApp events to a RabbitMQ queue for global event distribution. When enabled, all WhatsApp events will be published to the specified queue regardless of individual user webhook configurations.
+Genfity supports sending WhatsApp events to a RabbitMQ queue for global event distribution. When enabled, all WhatsApp events will be published to the specified queue regardless of individual user webhook configurations.
 
 Set these environment variables to enable RabbitMQ integration:
 
@@ -121,7 +121,7 @@ When enabled:
 
 #### Key configuration options:
 
-* WUZAPI_ADMIN_TOKEN: Required - Authentication token for admin endpoints
+* WA_ADMIN_TOKEN: Required - Authentication token for admin endpoints
 * TZ: Optional - Timezone for server operations (default: UTC)
 * PostgreSQL-specific options: Only required when using PostgreSQL backend
 * RabbitMQ options: Optional, only required if you want to publish events to RabbitMQ
@@ -136,7 +136,7 @@ To interact with the API, you must include the `Authorization` header in HTTP re
 
 ## ADMIN Actions
 
-You can list, add and remove users using the admin endpoints. For that you must use the WUZAPI_ADMIN_TOKEN in the Authorization header
+You can list, add and remove users using the admin endpoints. For that you must use the WA_ADMIN_TOKEN in the Authorization header
 
 Then you can use the /admin/users endpoint with the Authorization header containing the token to:
 
@@ -203,7 +203,7 @@ If you omit `proxyConfig` or `s3Config`, the user will be created without proxy 
 API calls should be made with content type json, and parameters sent into the
 request body, always passing the Token header for authenticating the request.
 
-Check the [API Reference](https://github.com/asternic/wuzapi/blob/main/API.md)
+Check the [API Reference](https://github.com/asternic/genfity-wa/blob/main/API.md)
 
 ## Contributors
 
@@ -324,7 +324,7 @@ Check the [API Reference](https://github.com/asternic/wuzapi/blob/main/API.md)
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=asternic/wuzapi&type=Date)](https://www.star-history.com/#asternic/wuzapi&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=asternic/genfity&type=Date)](https://www.star-history.com/#asternic/genfity&Date)
 
 ## License
 

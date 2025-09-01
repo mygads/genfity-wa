@@ -54,7 +54,7 @@ Adds a new user
 
 Example Request:
 ```
-curl -s -X POST -H 'Authorization: {{WUZAPI_ADMIN_TOKEN}}' -H 'Content-Type: application/json' --data '{"name":"usuario2","token":"token2","webhook":"https://example.com/webhook2","events":"Message,ReadReceipt"}' http://localhost:8080/admin/users
+curl -s -X POST -H 'Authorization: {{GENFITY_ADMIN_TOKEN}}' -H 'Content-Type: application/json' --data '{"name":"usuario2","token":"token2","webhook":"https://example.com/webhook2","events":"Message,ReadReceipt"}' http://localhost:8080/admin/users
 ```
 
 Response:
@@ -118,7 +118,7 @@ Deletes one user from the system by ID
 
 Example Request:
 ```
-curl -s -X DELETE -H 'Authorization: {{WUZAPI_ADMIN_TOKEN}}' http://localhost:8080/admin/users/2
+curl -s -X DELETE -H 'Authorization: {{GENFITY_ADMIN_TOKEN}}' http://localhost:8080/admin/users/2
 ```
 
 Response:
@@ -1151,11 +1151,11 @@ Response:
 }
 ```
 
-# S3 Storage Integration for WuzAPI
+# S3 Storage Integration for Genfity Wa
 
 ## Overview
 
-WuzAPI now supports S3-compatible storage for media files, allowing you to store WhatsApp media (images, videos, audio, and documents) in cloud storage services instead of or in addition to base64 encoding in webhooks.
+Genfity Wa now supports S3-compatible storage for media files, allowing you to store WhatsApp media (images, videos, audio, and documents) in cloud storage services instead of or in addition to base64 encoding in webhooks.
 
 ## Features
 
