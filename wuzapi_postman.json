@@ -416,6 +416,32 @@
             "description": "Update webhook"
           },
           "response": []
+        },
+        {
+          "name": "Get Webhook Events",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/webhook/events?active=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook", "events"],
+              "query": [
+                {
+                  "key": "active",
+                  "value": "true",
+                  "description": "Set to true to get only active events"
+                }
+              ]
+            },
+            "description": "Get list of available webhook events"
+          },
+          "response": []
         }
       ]
     },

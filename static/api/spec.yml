@@ -134,6 +134,97 @@ paths:
             application/json:
               schema:
                 example: { "code": 200, "data": { "WebhookURL": "https://example.net/webhook", "Events": ["Message", "ReadReceipt"], "active": true }, "success": true }
+  /webhook/events:
+    get:
+      tags:
+        - Webhook
+      summary: Get available webhook events
+      description: |
+        Returns the list of available webhook events that can be subscribed to.
+
+        ## Available Event Types
+
+        The following event types are available for webhook subscription:
+
+        **Messages and Communication:**
+        * Message - Received or sent message
+        * MessageSent - Message sent confirmation
+        * UndecryptableMessage - Message that could not be decrypted
+        * Receipt - Delivery/read confirmation
+        * MediaRetry - Media retry attempt
+        * ReadReceipt - Read receipt
+
+        **Groups and Contacts:**
+        * GroupInfo - Updated group information
+        * JoinedGroup - Joined a group
+        * Picture - Updated profile picture
+        * BlocklistChange - Change in blocked list
+        * Blocklist - Blocked list
+
+        **Connection and Session:**
+        * Connected - Connected to WhatsApp
+        * Disconnected - Disconnected from WhatsApp
+        * ConnectFailure - Connection failure
+        * KeepAliveRestored - Connection restored
+        * KeepAliveTimeout - Connection timeout
+        * LoggedOut - Session ended
+        * ClientOutdated - Outdated client
+        * TemporaryBan - Temporary ban
+        * StreamError - Stream error
+        * StreamReplaced - Stream replaced
+        * PairSuccess - Successful pairing
+        * PairError - Pairing error
+        * QR - QR code generated
+        * QRScannedWithoutMultidevice - QR scanned without multi-device
+
+        **Privacy and Settings:**
+        * PrivacySettings - Privacy settings
+        * PushNameSetting - Display name changed
+        * UserAbout - Status/About updated
+
+        **Synchronization and State:**
+        * AppState - Application state
+        * AppStateSyncComplete - Complete synchronization
+        * HistorySync - History synchronization
+        * OfflineSyncCompleted - Offline synchronization complete
+        * OfflineSyncPreview - Offline synchronization preview
+
+        **Calls:**
+        * CallOffer - Call offer
+        * CallAccept - Call accepted
+        * CallTerminate - Call ended
+        * CallOfferNotice - Call offer notification
+        * CallRelayLatency - Call relay latency
+
+        **Presence and Activity:**
+        * Presence - Presence status
+        * ChatPresence - Chat presence (typing)
+
+        **Others:**
+        * IdentityChange - Identity change
+        * CATRefreshError - CAT refresh error
+        * NewsletterJoin - Joined newsletter
+        * NewsletterLeave - Left newsletter
+        * NewsletterMuteChange - Newsletter mute change
+        * NewsletterLiveUpdate - Newsletter live update
+        * FBMessage - Facebook Bridge message
+        * All - Receive all events
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: query
+          name: active
+          schema:
+            type: boolean
+          required: false
+          description: If set to true, returns only active events. If false or not provided, returns all events.
+      responses:
+        200:
+          description: Response
+          content:
+            application/json:
+              schema:
+                example: { "code": 200, "data": { "active_events": ["Message", "MessageSent", "Receipt", "Connected", "Disconnected", "ConnectFailure", "LoggedOut", "StreamReplaced", "PairSuccess", "QR", "PushNameSetting", "AppState", "AppStateSyncComplete", "HistorySync", "CallOffer", "CallAccept", "CallTerminate", "CallOfferNotice", "CallRelayLatency", "Presence", "ChatPresence", "All"], "all_supported_events": ["Message", "MessageSent", "UndecryptableMessage", "Receipt", "MediaRetry", "ReadReceipt", "GroupInfo", "JoinedGroup", "Picture", "BlocklistChange", "Blocklist", "Connected", "Disconnected", "ConnectFailure", "KeepAliveRestored", "KeepAliveTimeout", "LoggedOut", "ClientOutdated", "TemporaryBan", "StreamError", "StreamReplaced", "PairSuccess", "PairError", "QR", "QRScannedWithoutMultidevice", "PrivacySettings", "PushNameSetting", "UserAbout", "AppState", "AppStateSyncComplete", "HistorySync", "OfflineSyncCompleted", "OfflineSyncPreview", "CallOffer", "CallAccept", "CallTerminate", "CallOfferNotice", "CallRelayLatency", "Presence", "ChatPresence", "IdentityChange", "CATRefreshError", "NewsletterJoin", "NewsletterLeave", "NewsletterMuteChange", "NewsletterLiveUpdate", "FBMessage", "All"], "not_implemented_events": ["UndecryptableMessage", "MediaRetry", "ReadReceipt", "GroupInfo", "JoinedGroup", "Picture", "BlocklistChange", "Blocklist", "KeepAliveRestored", "KeepAliveTimeout", "ClientOutdated", "TemporaryBan", "StreamError", "PairError", "QRScannedWithoutMultidevice", "PrivacySettings", "UserAbout", "OfflineSyncCompleted", "OfflineSyncPreview", "IdentityChange", "CATRefreshError", "NewsletterJoin", "NewsletterLeave", "NewsletterMuteChange", "NewsletterLiveUpdate", "FBMessage"] }, "success": true }
   /session/connect:
     post:
       tags:

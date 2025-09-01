@@ -590,6 +590,142 @@
 }</code></pre>
             </div>
 
+            <div class="endpoint">
+                <h3><span class="method get">GET</span> <span class="path">/webhook/events</span></h3>
+                <p>Gets the list of available webhook events that can be subscribed to.</p>
+                
+                <h4>Query Parameters:</h4>
+                <table class="api-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>active</td>
+                            <td>boolean</td>
+                            <td>If set to true, returns only active events. If false or not provided, returns all events.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h4>Request Example:</h4>
+                <pre><code class="language-bash">GET /webhook/events?active=true</code></pre>
+                
+                <h4>Response:</h4>
+                <pre><code class="language-json">{
+  "code": 200,
+  "data": {
+    "active_events": [
+      "Message",
+      "MessageSent", 
+      "Receipt",
+      "Connected",
+      "Disconnected",
+      "ConnectFailure",
+      "LoggedOut",
+      "StreamReplaced",
+      "PairSuccess",
+      "QR",
+      "PushNameSetting",
+      "AppState",
+      "AppStateSyncComplete",
+      "HistorySync",
+      "CallOffer",
+      "CallAccept",
+      "CallTerminate",
+      "CallOfferNotice",
+      "CallRelayLatency",
+      "Presence",
+      "ChatPresence",
+      "All"
+    ],
+    "all_supported_events": [
+      "Message",
+      "MessageSent",
+      "UndecryptableMessage",
+      "Receipt",
+      "MediaRetry",
+      "ReadReceipt",
+      "GroupInfo",
+      "JoinedGroup",
+      "Picture",
+      "BlocklistChange",
+      "Blocklist",
+      "Connected",
+      "Disconnected",
+      "ConnectFailure",
+      "KeepAliveRestored",
+      "KeepAliveTimeout",
+      "LoggedOut",
+      "ClientOutdated",
+      "TemporaryBan",
+      "StreamError",
+      "StreamReplaced",
+      "PairSuccess",
+      "PairError",
+      "QR",
+      "QRScannedWithoutMultidevice",
+      "PrivacySettings",
+      "PushNameSetting",
+      "UserAbout",
+      "AppState",
+      "AppStateSyncComplete",
+      "HistorySync",
+      "OfflineSyncCompleted",
+      "OfflineSyncPreview",
+      "CallOffer",
+      "CallAccept",
+      "CallTerminate",
+      "CallOfferNotice",
+      "CallRelayLatency",
+      "Presence",
+      "ChatPresence",
+      "IdentityChange",
+      "CATRefreshError",
+      "NewsletterJoin",
+      "NewsletterLeave",
+      "NewsletterMuteChange",
+      "NewsletterLiveUpdate",
+      "FBMessage",
+      "All"
+    ],
+    "not_implemented_events": [
+      "UndecryptableMessage",
+      "MediaRetry",
+      "ReadReceipt",
+      "GroupInfo",
+      "JoinedGroup",
+      "Picture",
+      "BlocklistChange",
+      "Blocklist",
+      "KeepAliveRestored",
+      "KeepAliveTimeout",
+      "ClientOutdated",
+      "TemporaryBan",
+      "StreamError",
+      "PairError",
+      "QRScannedWithoutMultidevice",
+      "PrivacySettings",
+      "UserAbout",
+      "OfflineSyncCompleted",
+      "OfflineSyncPreview",
+      "IdentityChange",
+      "CATRefreshError",
+      "NewsletterJoin",
+      "NewsletterLeave",
+      "NewsletterMuteChange",
+      "NewsletterLiveUpdate",
+      "FBMessage"
+    ]
+  },
+  "success": true
+}</code></pre>
+            </div>
+
             <h3>Available Event Types</h3>
             <p>Below is the complete list of events you can subscribe to:</p>
             
