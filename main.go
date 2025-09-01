@@ -183,6 +183,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	log.Info().Msg("✅ Database schema initialized successfully")
+
 	var dbLog waLog.Logger
 	if *waDebug != "" {
 		dbLog = waLog.Stdout("Database", *waDebug, *colorOutput)

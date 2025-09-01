@@ -311,63 +311,33 @@
           <label>Webhook Events</label>
           <select id="webhookEvents" class="ui fluid dropdown" multiple="">
             <option value="">Select Events</option>
-            <!-- Messages and Communication -->
+            <!-- Messages and Communication (Active) -->
             <option value="Message">Message</option>
             <option value="MessageSent">Message Sent</option>
-            <option value="UndecryptableMessage">Undecryptable Message</option>
             <option value="Receipt">Receipt</option>
-            <option value="MediaRetry">Media Retry</option>
-            <!-- Groups and Contacts -->
-            <option value="GroupInfo">Group Info</option>
-            <option value="JoinedGroup">Joined Group</option>
-            <option value="Picture">Picture</option>
-            <option value="BlocklistChange">Blocklist Change</option>
-            <option value="Blocklist">Blocklist</option>
-            <!-- Connection and Session -->
+            <!-- Connection and Session (Active) -->
             <option value="Connected">Connected</option>
             <option value="Disconnected">Disconnected</option>
             <option value="ConnectFailure">Connect Failure</option>
-            <option value="KeepAliveRestored">Keep Alive Restored</option>
-            <option value="KeepAliveTimeout">Keep Alive Timeout</option>
             <option value="LoggedOut">Logged Out</option>
-            <option value="ClientOutdated">Client Outdated</option>
-            <option value="TemporaryBan">Temporary Ban</option>
-            <option value="StreamError">Stream Error</option>
             <option value="StreamReplaced">Stream Replaced</option>
             <option value="PairSuccess">Pair Success</option>
-            <option value="PairError">Pair Error</option>
             <option value="QR">QR</option>
-            <option value="QRScannedWithoutMultidevice">QR Scanned Without Multidevice</option>
-            <!-- Privacy and Settings -->
-            <option value="PrivacySettings">Privacy Settings</option>
+            <!-- Privacy and Settings (Active) -->
             <option value="PushNameSetting">Push Name Setting</option>
-            <option value="UserAbout">User About</option>
-            <!-- Synchronization and State -->
+            <!-- Synchronization and State (Active) -->
             <option value="AppState">App State</option>
             <option value="AppStateSyncComplete">App State Sync Complete</option>
             <option value="HistorySync">History Sync</option>
-            <option value="OfflineSyncCompleted">Offline Sync Completed</option>
-            <option value="OfflineSyncPreview">Offline Sync Preview</option>
-            <!-- Calls -->
+            <!-- Calls (Active - Logging Only) -->
             <option value="CallOffer">Call Offer</option>
             <option value="CallAccept">Call Accept</option>
             <option value="CallTerminate">Call Terminate</option>
             <option value="CallOfferNotice">Call Offer Notice</option>
             <option value="CallRelayLatency">Call Relay Latency</option>
-            <!-- Presence and Activity -->
+            <!-- Presence and Activity (Active) -->
             <option value="Presence">Presence</option>
             <option value="ChatPresence">Chat Presence</option>
-            <!-- Identity -->
-            <option value="IdentityChange">Identity Change</option>
-            <!-- Errors -->
-            <option value="CATRefreshError">CAT Refresh Error</option>
-            <!-- Newsletter (WhatsApp Channels) -->
-            <option value="NewsletterJoin">Newsletter Join</option>
-            <option value="NewsletterLeave">Newsletter Leave</option>
-            <option value="NewsletterMuteChange">Newsletter Mute Change</option>
-            <option value="NewsletterLiveUpdate">Newsletter Live Update</option>
-            <!-- Facebook/Meta Bridge -->
-            <option value="FBMessage">FB Message</option>
             <!-- Special -->
             <option value="All">All Events</option>
           </select>
@@ -506,63 +476,33 @@
           <label>Events <span class="required">*</span></label>
           <select name="events" id="webhookEventsInstance" class="ui fluid dropdown" multiple="" required>
             <option value="">Select Events</option>
-            <!-- Messages and Communication -->
+            <!-- Messages and Communication (Active) -->
             <option value="Message">Message</option>
             <option value="MessageSent">Message Sent</option>
-            <option value="UndecryptableMessage">Undecryptable Message</option>
             <option value="Receipt">Receipt</option>
-            <option value="MediaRetry">Media Retry</option>
-            <!-- Groups and Contacts -->
-            <option value="GroupInfo">Group Info</option>
-            <option value="JoinedGroup">Joined Group</option>
-            <option value="Picture">Picture</option>
-            <option value="BlocklistChange">Blocklist Change</option>
-            <option value="Blocklist">Blocklist</option>
-            <!-- Connection and Session -->
+            <!-- Connection and Session (Active) -->
             <option value="Connected">Connected</option>
             <option value="Disconnected">Disconnected</option>
             <option value="ConnectFailure">Connect Failure</option>
-            <option value="KeepAliveRestored">Keep Alive Restored</option>
-            <option value="KeepAliveTimeout">Keep Alive Timeout</option>
             <option value="LoggedOut">Logged Out</option>
-            <option value="ClientOutdated">Client Outdated</option>
-            <option value="TemporaryBan">Temporary Ban</option>
-            <option value="StreamError">Stream Error</option>
             <option value="StreamReplaced">Stream Replaced</option>
             <option value="PairSuccess">Pair Success</option>
-            <option value="PairError">Pair Error</option>
             <option value="QR">QR</option>
-            <option value="QRScannedWithoutMultidevice">QR Scanned Without Multidevice</option>
-            <!-- Privacy and Settings -->
-            <option value="PrivacySettings">Privacy Settings</option>
+            <!-- Privacy and Settings (Active) -->
             <option value="PushNameSetting">Push Name Setting</option>
-            <option value="UserAbout">User About</option>
-            <!-- Synchronization and State -->
+            <!-- Synchronization and State (Active) -->
             <option value="AppState">App State</option>
             <option value="AppStateSyncComplete">App State Sync Complete</option>
             <option value="HistorySync">History Sync</option>
-            <option value="OfflineSyncCompleted">Offline Sync Completed</option>
-            <option value="OfflineSyncPreview">Offline Sync Preview</option>
-            <!-- Calls -->
+            <!-- Calls (Active - Logging Only) -->
             <option value="CallOffer">Call Offer</option>
             <option value="CallAccept">Call Accept</option>
             <option value="CallTerminate">Call Terminate</option>
             <option value="CallOfferNotice">Call Offer Notice</option>
             <option value="CallRelayLatency">Call Relay Latency</option>
-            <!-- Presence and Activity -->
+            <!-- Presence and Activity (Active) -->
             <option value="Presence">Presence</option>
             <option value="ChatPresence">Chat Presence</option>
-            <!-- Identity -->
-            <option value="IdentityChange">Identity Change</option>
-            <!-- Errors -->
-            <option value="CATRefreshError">CAT Refresh Error</option>
-            <!-- Newsletter (WhatsApp Channels) -->
-            <option value="NewsletterJoin">Newsletter Join</option>
-            <option value="NewsletterLeave">Newsletter Leave</option>
-            <option value="NewsletterMuteChange">Newsletter Mute Change</option>
-            <option value="NewsletterLiveUpdate">Newsletter Live Update</option>
-            <!-- Facebook/Meta Bridge -->
-            <option value="FBMessage">FB Message</option>
             <!-- Special -->
             <option value="All">All Events</option>
           </select>

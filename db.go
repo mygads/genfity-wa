@@ -7,6 +7,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"github.com/rs/zerolog/log"
 	_ "modernc.org/sqlite"
 )
 
@@ -38,7 +39,7 @@ func getDatabaseConfig(exPath string) DatabaseConfig {
 	dbPort := os.Getenv("DB_PORT")
 	dbSSL := os.Getenv("DB_SSLMODE")
 
-    sslMode := dbSSL
+	sslMode := dbSSL
 	if dbSSL == "true" {
 		sslMode = "require"
 	} else if dbSSL == "false" || dbSSL == "" {
@@ -69,6 +70,13 @@ func initializePostgres(config DatabaseConfig) (*sqlx.DB, error) {
 		config.User, config.Password, config.Name, config.Host, config.Port, config.SSLMode,
 	)
 
+	log.Info().
+		Str("host", config.Host).
+		Str("port", config.Port).
+		Str("database", config.Name).
+		Str("sslmode", config.SSLMode).
+		Msg("Attempting to connect to PostgreSQL database...")
+
 	db, err := sqlx.Open("postgres", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open postgres connection: %w", err)
@@ -77,6 +85,12 @@ func initializePostgres(config DatabaseConfig) (*sqlx.DB, error) {
 	if err := db.Ping(); err != nil {
 		return nil, fmt.Errorf("failed to ping postgres database: %w", err)
 	}
+
+	log.Info().
+		Str("host", config.Host).
+		Str("port", config.Port).
+		Str("database", config.Name).
+		Msg("✅ PostgreSQL database connected successfully")
 
 	return db, nil
 }
@@ -87,6 +101,11 @@ func initializeSQLite(config DatabaseConfig) (*sqlx.DB, error) {
 	}
 
 	dbPath := filepath.Join(config.Path, "users.db")
+
+	log.Info().
+		Str("path", dbPath).
+		Msg("Attempting to connect to SQLite database...")
+
 	db, err := sqlx.Open("sqlite", dbPath+"?_pragma=foreign_keys(1)&_busy_timeout=3000")
 	if err != nil {
 		return nil, fmt.Errorf("failed to open sqlite database: %w", err)
@@ -95,6 +114,10 @@ func initializeSQLite(config DatabaseConfig) (*sqlx.DB, error) {
 	if err := db.Ping(); err != nil {
 		return nil, fmt.Errorf("failed to ping sqlite database: %w", err)
 	}
+
+	log.Info().
+		Str("path", dbPath).
+		Msg("✅ SQLite database connected successfully")
 
 	return db, nil
 }

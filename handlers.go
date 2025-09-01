@@ -417,7 +417,7 @@ func (s *server) SetWebhook() http.HandlerFunc {
 		if len(t.Events) > 0 {
 			var validEvents []string
 			for _, event := range t.Events {
-				if !Find(supportedEventTypes, event) {
+				if !Find(activeEventTypes, event) {
 					log.Warn().Str("Type", event).Msg("Event type discarded")
 					continue
 				}
@@ -451,6 +451,35 @@ func (s *server) SetWebhook() http.HandlerFunc {
 		userinfocache.Set(token, v, cache.NoExpiration)
 
 		response := map[string]interface{}{"webhook": webhook}
+		responseJson, err := json.Marshal(response)
+		if err != nil {
+			s.Respond(w, r, http.StatusInternalServerError, err)
+		} else {
+			s.Respond(w, r, http.StatusOK, string(responseJson))
+		}
+	}
+}
+
+// GetWebhookEvents returns the list of available webhook events
+func (s *server) GetWebhookEvents() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Check if user wants only active events
+		onlyActive := r.URL.Query().Get("active")
+
+		response := map[string]interface{}{
+			"active_events":          activeEventTypes,
+			"all_supported_events":   supportedEventTypes,
+			"not_implemented_events": notImplementedEventTypes,
+		}
+
+		// If only active events are requested, return only those
+		if onlyActive == "true" {
+			response = map[string]interface{}{
+				"events": activeEventTypes,
+				"status": "active_only",
+			}
+		}
+
 		responseJson, err := json.Marshal(response)
 		if err != nil {
 			s.Respond(w, r, http.StatusInternalServerError, err)
@@ -1992,7 +2021,7 @@ func (s *server) SendPoll() http.HandlerFunc {
 		pollMessage := clientManager.GetWhatsmeowClient(txtid).BuildPollCreation(req.Header, req.Options, 1)
 		resp, err = clientManager.GetWhatsmeowClient(txtid).SendMessage(context.Background(), recipient, pollMessage, whatsmeow.SendRequestExtra{ID: msgid})
 		if err != nil {
-			s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("failed to send poll: %v", err)))
+			s.Respond(w, r, http.StatusInternalServerError, fmt.Errorf("failed to send poll: %v", err))
 			return
 		}
 

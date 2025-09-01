@@ -1,4 +1,4 @@
-module wuzapi
+module genfity-wa
 
 go 1.23.0
 

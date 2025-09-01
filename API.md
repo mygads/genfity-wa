@@ -133,12 +133,59 @@ Response:
 
 ## Webhook
 
-The following _webhook_ endpoints are used to get or set the webhook that will be called whenever a message or event is received. Available event types are:
+The following _webhook_ endpoints are used to get or set the webhook that will be called whenever a message or event is received.
 
-* Message
-* ReadReceipt
-* HistorySync
-* ChatPresence
+For a complete list of available events, see the `/webhook/events` endpoint below.
+
+## Get Available Webhook Events
+
+Retrieves the list of available webhook events.
+
+Endpoint: _/webhook/events_
+
+Method: **GET**
+
+Authentication: **None** (public endpoint)
+
+Parameters:
+- `active` (optional): Set to "true" to get only active/implemented events
+
+```bash
+# Get all event information
+curl -s -X GET http://localhost:8080/webhook/events
+
+# Get only active events
+curl -s -X GET http://localhost:8080/webhook/events?active=true
+```
+
+Response (default):
+```json
+{
+  "active_events": [
+    "Message", "MessageSent", "Receipt", "Connected", "Disconnected",
+    "ConnectFailure", "LoggedOut", "StreamReplaced", "PairSuccess",
+    "QR", "PushNameSetting", "AppState", "AppStateSyncComplete",
+    "HistorySync", "CallOffer", "CallAccept", "CallTerminate",
+    "CallOfferNotice", "CallRelayLatency", "Presence", "ChatPresence", "All"
+  ],
+  "all_supported_events": ["Message", "MessageSent", "UndecryptableMessage", ...],
+  "not_implemented_events": ["UndecryptableMessage", "MediaRetry", ...]
+}
+```
+
+Response (with `?active=true`):
+```json
+{
+  "events": [
+    "Message", "MessageSent", "Receipt", "Connected", "Disconnected",
+    "ConnectFailure", "LoggedOut", "StreamReplaced", "PairSuccess",
+    "QR", "PushNameSetting", "AppState", "AppStateSyncComplete",
+    "HistorySync", "CallOffer", "CallAccept", "CallTerminate",
+    "CallOfferNotice", "CallRelayLatency", "Presence", "ChatPresence", "All"
+  ],
+  "status": "active_only"
+}
+```
 
 
 ## Sets webhook

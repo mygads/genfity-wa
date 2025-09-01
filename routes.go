@@ -51,6 +51,9 @@ func (s *server) routes() {
 	adminRoutes.Handle("/users/{id}", s.DeleteUser()).Methods("DELETE")
 	adminRoutes.Handle("/users/{id}/full", s.DeleteUserComplete()).Methods("DELETE")
 
+	// Public routes (no authentication required)
+	s.router.Handle("/webhook/events", s.GetWebhookEvents()).Methods("GET")
+
 	c := alice.New()
 	c = c.Append(s.authalice)
 	c = c.Append(hlog.NewHandler(routerLog))

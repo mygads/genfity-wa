@@ -120,13 +120,11 @@ func updateAndGetUserSubscriptions(mycli *MyClient) ([]string, error) {
 	} else {
 		for _, arg := range eventarray {
 			arg = strings.TrimSpace(arg)
-			if arg != "" && Find(supportedEventTypes, arg) {
+			if arg != "" && Find(activeEventTypes, arg) {
 				subscribedEvents = append(subscribedEvents, arg)
 			}
 		}
-	}
-
-	// Update the client subscriptions
+	} // Update the client subscriptions
 	mycli.subscriptions = subscribedEvents
 
 	return subscribedEvents, nil
@@ -267,8 +265,8 @@ func (s *server) connectOnStartup() {
 				subscribedEvents = []string{}
 			} else {
 				for _, arg := range eventarray {
-					if !Find(supportedEventTypes, arg) {
-						log.Warn().Str("Type", arg).Msg("Event type discarded")
+					if !Find(activeEventTypes, arg) {
+						log.Warn().Str("Type", arg).Msg("Event type discarded - not active/implemented")
 						continue
 					}
 					if !Find(subscribedEvents, arg) {
