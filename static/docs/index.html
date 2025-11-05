@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GENFITY WA - Documentation</title>
+    <title>Genfity WA Documentation</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
     <style>
@@ -221,58 +221,59 @@
 
     <nav class="sidebar" id="sidebar">
         <div class="nav-header">
-            <img src="/images/logo-light.svg" alt="Genfity Logo" class="logo">
-            <!-- <h5 class="mb-0">Genfity</h5> -->
+            <img src="/images/favicon.png" alt="Genfity WA Logo" class="logo">
+            <h5 class="mb-0">Genfity WA</h5>
         </div>
         <div class="nav flex-column">
-            <a class="nav-link active" href="#introduction">Introduction</a>
-            <a class="nav-link" href="#authentication">Authentication</a>
-            <a class="nav-link" href="#getting-started">Getting Started</a>
-            
+            <a class="nav-link active" href="#introducao">Introduction</a>
+            <a class="nav-link" href="#autenticacao">Authentication</a>
+            <a class="nav-link" href="#primeiros-passos">Getting Started</a>
+
             <div class="px-3 mt-3 mb-1 text-uppercase small fw-bold text-muted">Endpoints</div>
-            
+
             <a class="nav-link" href="#session">Session</a>
             <a class="nav-link" href="#webhook">Webhook</a>
             <a class="nav-link" href="#chat">Chat</a>
             <a class="nav-link" href="#user">User</a>
             <a class="nav-link" href="#group">Group</a>
+            <a class="nav-link" href="#admin">Admin</a>
             <a class="nav-link" href="#newsletter">Newsletter</a>
-            
+
             <div class="px-3 mt-3 mb-1 text-uppercase small fw-bold text-muted">Configuration</div>
-            
-            <a class="nav-link" href="#s3config">S3 Storage</a>
-            <a class="nav-link" href="#proxyconfig">Proxy</a>
-            
+
+            <a class="nav-link" href="#s3-config">S3 Storage</a>
+            <a class="nav-link" href="#proxy-config">Proxy</a>
+
             <div class="px-3 mt-3 mb-1 text-uppercase small fw-bold text-muted">Advanced</div>
-            
-            <a class="nav-link" href="#webhook-structure">Webhook Structure</a>
-            <a class="nav-link" href="#best-practices">Best Practices</a>
+
+            <a class="nav-link" href="#estrutura-webhook">Webhook Structure</a>
+            <a class="nav-link" href="#melhores-praticas">Best Practices</a>
             <a class="nav-link" href="#faq">FAQ</a>
         </div>
     </nav>
 
     <main class="content" id="content">
         <div class="top-nav">
-            <h1>Genfity WHATSAPP API Documentation</h1>
+            <h1>Genfity WA Documentation</h1>
             <div>
                 <a href="/dashboard" class="dashboard-button me-2">Dashboard</a>
                 <a href="/api" class="dashboard-button">Swagger</a>
             </div>
         </div>
 
-        <section id="introduction">
+        <section id="introducao">
             <p class="lead">
-                Genfity Whatsapp API is an implementation of the <a href="https://github.com/tulir/whatsmeow" target="_blank">whatsmeow</a> library as a simple RESTful API service.
+                Genfity WA is an implementation of the <a href="https://github.com/tulir/whatsmeow" target="_blank">whatsmeow</a> library as a simple RESTful API service with support for multiple devices and concurrent sessions.
             </p>
             <p>
-                The whatsmeow library does not use Puppeteer on headless Chrome, nor an Android emulator. It communicates directly with WhatsApp's WebSocket servers, making it significantly faster and much less demanding on memory and CPU than those solutions. The drawback is that any changes to the WhatsApp protocol could break connections, requiring a library update.
+                The whatsmeow library does not use Puppeteer in headless Chrome, nor an Android emulator. It communicates directly with WhatsApp's websocket servers, being quite fast and using less memory and CPU than other solutions. The disadvantage is that a change in WhatsApp's protocol could break connections and would require a library update.
             </p>
             <div class="alert alert-warning">
-                <strong>⚠️ Warning:</strong> Using this software in violation of WhatsApp's Terms of Service can get your number banned. Be very careful—do not use this to send SPAM or anything similar. Use at your own risk. If you need to develop something for commercial purposes, contact a WhatsApp global solution provider and sign up for the WhatsApp Business API service instead.
+                <strong>⚠️ Warning:</strong> Using this software in violation of WhatsApp's Terms of Service may result in your number being banned. Be very careful, do not use it to send SPAM or similar. Use at your own risk. If you need to develop something with commercial interest, contact a global WhatsApp solutions provider and sign up for the WhatsApp Business API service.
             </div>
         </section>
 
-        <section id="authentication">
+        <section id="autenticacao">
             <div class="section-title">
                 <div class="section-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -281,21 +282,22 @@
                 </div>
                 <h2 class="mb-0">Authentication</h2>
             </div>
-            <p>Genfity offers two methods of authentication:</p>
+            <p>Genfity WA offers two authentication methods:</p>
             <ul>
-                <li><strong>For regular users:</strong> Use the <code>token</code> header that will be matched against the 'users' table in the database.</li>
+                <li><strong>For regular users:</strong> Use the <code>token</code> header which will be matched with the 'users' table in the database.</li>
+                <li><strong>For administrators:</strong> Use the <code>Authorization</code> header with the administrative token to access protected administration routes.</li>
             </ul>
             <p>Example request with user token:</p>
-            <pre><code class="language-bash">curl -X POST https://your-domain.com/webhook \
-  -H "token: your_token_here" \
+            <pre><code class="language-bash">curl -X POST https://seu-dominio.com/webhook \
+  -H "token: seu_token_aqui" \
   -H "Content-Type: application/json" \
   -d '{
-    "webhook": "https://your-webhook.com/callback",
+    "webhook": "https://seu-webhook.com/callback",
     "events": ["Message", "ReadReceipt"]
   }'</code></pre>
         </section>
 
-        <section id="getting-started">
+        <section id="primeiros-passos">
             <div class="section-title">
                 <div class="section-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -305,20 +307,20 @@
                 <h2 class="mb-0">Getting Started</h2>
             </div>
 
-            <p>To start using the Genfity Whatsapp API, follow these steps:</p>
+            <p>To start using the Genfity WA API, follow these steps:</p>
 
             <ol>
                 <li>
                     <strong>Create a user:</strong>
-                    <p>You need to create a user in the database. User management can be done through the API endpoints.</p>
+                    <p>You need to create a user in the database. The administrator can create a new user through the <code>/admin/users</code> route.</p>
                 </li>
                 <li>
                     <strong>Connect to WhatsApp:</strong>
-                    <p>Use the <code>/session/connect</code> endpoint to initiate a connection to WhatsApp servers.</p>
+                    <p>Use the <code>/session/connect</code> endpoint to start a connection with WhatsApp servers.</p>
                 </li>
                 <li>
                     <strong>Scan the QR code:</strong>
-                    <p>Get the QR code through the <code>/session/qr</code> endpoint and scan it with your WhatsApp application.</p>
+                    <p>Get the QR code through the <code>/session/qr</code> endpoint and scan it with your WhatsApp app.</p>
                 </li>
                 <li>
                     <strong>Configure your Webhook:</strong>
@@ -344,11 +346,11 @@
                 </div>
                 <h2 class="mb-0">Session</h2>
             </div>
-            <p>Endpoints for managing the connection to WhatsApp servers.</p>
+            <p>Endpoints to manage the connection with WhatsApp servers.</p>
 
             <div class="endpoint">
                 <h3><span class="method post">POST</span> <span class="path">/session/connect</span></h3>
-                <p>Connects to WhatsApp servers. If there is no previous session, it will be necessary to scan a QR code.</p>
+                <p>Connects to WhatsApp servers. If there is no previous session, you will need to scan a QR code.</p>
                 
                 <h4>Body Parameters:</h4>
                 <table class="api-table">
@@ -408,7 +410,7 @@
 
             <div class="endpoint">
                 <h3><span class="method post">POST</span> <span class="path">/session/logout</span></h3>
-                <p>Ends the connection and terminates the session, requiring QR scanning again on the next connection.</p>
+                <p>Ends the connection and terminates the session, requiring QR scanning again on next connection.</p>
                 
                 <h4>Response:</h4>
                 <pre><code class="language-json">{
@@ -437,7 +439,7 @@
 
             <div class="endpoint">
                 <h3><span class="method get">GET</span> <span class="path">/session/qr</span></h3>
-                <p>Gets the QR code for scanning in the WhatsApp application.</p>
+                <p>Gets the QR code for scanning in the WhatsApp app.</p>
                 
                 <h4>Response:</h4>
                 <pre><code class="language-json">{
@@ -459,7 +461,7 @@
                 </div>
                 <h2 class="mb-0">Webhook</h2>
             </div>
-            <p>Endpoints for configuring webhooks that will receive event notifications.</p>
+            <p>Endpoints to configure webhooks that will receive event notifications.</p>
 
             <div class="endpoint">
                 <h3><span class="method get">GET</span> <span class="path">/webhook</span></h3>
@@ -493,7 +495,7 @@
                         <tr>
                             <td class="required">webhook</td>
                             <td>string</td>
-                            <td>URL of the webhook that will receive the calls</td>
+                            <td>Webhook URL that will receive the calls</td>
                         </tr>
                         <tr>
                             <td>events</td>
@@ -547,7 +549,7 @@
                         <tr>
                             <td>events</td>
                             <td>Array[string]</td>
-                            <td>New list of events (optional if only updating URL)</td>
+                            <td>New event list (optional if only updating URL)</td>
                         </tr>
                         <tr>
                             <td>active</td>
@@ -558,19 +560,19 @@
                 </table>
                 
                 <h4>Request Examples:</h4>
-                <pre><code class="language-json">// Update only events
+                <pre><code class="language-json">// Atualizar apenas eventos
 {
   "events": ["Message", "Receipt", "GroupInfo"],
   "active": true
 }
 
-// Update only URL
+// Atualizar apenas URL
 {
-  "webhook": "https://new-endpoint.com/webhook",
+  "webhook": "https://novo-endpoint.com/webhook",
   "active": true
 }
 
-// Deactivate webhook
+// Desativar webhook
 {
   "active": false
 }</code></pre>
@@ -590,142 +592,6 @@
 }</code></pre>
             </div>
 
-            <div class="endpoint">
-                <h3><span class="method get">GET</span> <span class="path">/webhook/events</span></h3>
-                <p>Gets the list of available webhook events that can be subscribed to.</p>
-                
-                <h4>Query Parameters:</h4>
-                <table class="api-table">
-                    <thead>
-                        <tr>
-                            <th>Parameter</th>
-                            <th>Type</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>active</td>
-                            <td>boolean</td>
-                            <td>If set to true, returns only active events. If false or not provided, returns all events.</td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                <h4>Request Example:</h4>
-                <pre><code class="language-bash">GET /webhook/events?active=true</code></pre>
-                
-                <h4>Response:</h4>
-                <pre><code class="language-json">{
-  "code": 200,
-  "data": {
-    "active_events": [
-      "Message",
-      "MessageSent", 
-      "Receipt",
-      "Connected",
-      "Disconnected",
-      "ConnectFailure",
-      "LoggedOut",
-      "StreamReplaced",
-      "PairSuccess",
-      "QR",
-      "PushNameSetting",
-      "AppState",
-      "AppStateSyncComplete",
-      "HistorySync",
-      "CallOffer",
-      "CallAccept",
-      "CallTerminate",
-      "CallOfferNotice",
-      "CallRelayLatency",
-      "Presence",
-      "ChatPresence",
-      "All"
-    ],
-    "all_supported_events": [
-      "Message",
-      "MessageSent",
-      "UndecryptableMessage",
-      "Receipt",
-      "MediaRetry",
-      "ReadReceipt",
-      "GroupInfo",
-      "JoinedGroup",
-      "Picture",
-      "BlocklistChange",
-      "Blocklist",
-      "Connected",
-      "Disconnected",
-      "ConnectFailure",
-      "KeepAliveRestored",
-      "KeepAliveTimeout",
-      "LoggedOut",
-      "ClientOutdated",
-      "TemporaryBan",
-      "StreamError",
-      "StreamReplaced",
-      "PairSuccess",
-      "PairError",
-      "QR",
-      "QRScannedWithoutMultidevice",
-      "PrivacySettings",
-      "PushNameSetting",
-      "UserAbout",
-      "AppState",
-      "AppStateSyncComplete",
-      "HistorySync",
-      "OfflineSyncCompleted",
-      "OfflineSyncPreview",
-      "CallOffer",
-      "CallAccept",
-      "CallTerminate",
-      "CallOfferNotice",
-      "CallRelayLatency",
-      "Presence",
-      "ChatPresence",
-      "IdentityChange",
-      "CATRefreshError",
-      "NewsletterJoin",
-      "NewsletterLeave",
-      "NewsletterMuteChange",
-      "NewsletterLiveUpdate",
-      "FBMessage",
-      "All"
-    ],
-    "not_implemented_events": [
-      "UndecryptableMessage",
-      "MediaRetry",
-      "ReadReceipt",
-      "GroupInfo",
-      "JoinedGroup",
-      "Picture",
-      "BlocklistChange",
-      "Blocklist",
-      "KeepAliveRestored",
-      "KeepAliveTimeout",
-      "ClientOutdated",
-      "TemporaryBan",
-      "StreamError",
-      "PairError",
-      "QRScannedWithoutMultidevice",
-      "PrivacySettings",
-      "UserAbout",
-      "OfflineSyncCompleted",
-      "OfflineSyncPreview",
-      "IdentityChange",
-      "CATRefreshError",
-      "NewsletterJoin",
-      "NewsletterLeave",
-      "NewsletterMuteChange",
-      "NewsletterLiveUpdate",
-      "FBMessage"
-    ]
-  },
-  "success": true
-}</code></pre>
-            </div>
-
             <h3>Available Event Types</h3>
             <p>Below is the complete list of events you can subscribe to:</p>
             
@@ -733,19 +599,19 @@
                 <div class="col-md-6">
                     <h4>Messages and Communication</h4>
                     <ul>
-                        <li><code>Message</code> - Received or sent message</li>
+                        <li><code>Message</code> - Message received or sent</li>
                         <li><code>UndecryptableMessage</code> - Message that could not be decrypted</li>
                         <li><code>Receipt</code> - Delivery/read confirmation</li>
-                        <li><code>MediaRetry</code> - Media retry attempt</li>
+                        <li><code>MediaRetry</code> - Media resend attempt</li>
                     </ul>
                     
                     <h4>Groups and Contacts</h4>
                     <ul>
-                        <li><code>GroupInfo</code> - Updated group information</li>
+                        <li><code>GroupInfo</code> - Group information updated</li>
                         <li><code>JoinedGroup</code> - Joined a group</li>
-                        <li><code>Picture</code> - Updated profile picture</li>
-                        <li><code>BlocklistChange</code> - Change in blocked list</li>
-                        <li><code>Blocklist</code> - Blocked list</li>
+                        <li><code>Picture</code> - Profile picture updated</li>
+                        <li><code>BlocklistChange</code> - Blocklist change</li>
+                        <li><code>Blocklist</code> - Blocklist</li>
                     </ul>
                     
                     <h4>Connection and Session</h4>
@@ -756,13 +622,14 @@
                         <li><code>KeepAliveRestored</code> - Connection restored</li>
                         <li><code>KeepAliveTimeout</code> - Connection timeout</li>
                         <li><code>LoggedOut</code> - Session ended</li>
-                        <li><code>ClientOutdated</code> - Outdated client</li>
+                        <li><code>ClientOutdated</code> - Client outdated</li>
                         <li><code>TemporaryBan</code> - Temporary ban</li>
                         <li><code>StreamError</code> - Stream error</li>
                         <li><code>StreamReplaced</code> - Stream replaced</li>
-                        <li><code>PairSuccess</code> - Successful pairing</li>
+                        <li><code>PairSuccess</code> - Pairing successful</li>
                         <li><code>PairError</code> - Pairing error</li>
                         <li><code>QR</code> - QR code generated</li>
+                        <li><code>QRTimeout</code> - QR code timeout</li>
                         <li><code>QRScannedWithoutMultidevice</code> - QR scanned without multi-device</li>
                     </ul>
                 </div>
@@ -778,9 +645,9 @@
                     <h4>Synchronization and State</h4>
                     <ul>
                         <li><code>AppState</code> - Application state</li>
-                        <li><code>AppStateSyncComplete</code> - Complete synchronization</li>
+                        <li><code>AppStateSyncComplete</code> - Synchronization complete</li>
                         <li><code>HistorySync</code> - History synchronization</li>
-                        <li><code>OfflineSyncCompleted</code> - Offline synchronization complete</li>
+                        <li><code>OfflineSyncCompleted</code> - Offline synchronization completed</li>
                         <li><code>OfflineSyncPreview</code> - Offline synchronization preview</li>
                     </ul>
                     
@@ -788,7 +655,7 @@
                     <ul>
                         <li><code>CallOffer</code> - Call offer</li>
                         <li><code>CallAccept</code> - Call accepted</li>
-                        <li><code>CallTerminate</code> - Call ended</li>
+                        <li><code>CallTerminate</code> - Call terminated</li>
                         <li><code>CallOfferNotice</code> - Call offer notification</li>
                         <li><code>CallRelayLatency</code> - Call relay latency</li>
                     </ul>
@@ -814,7 +681,7 @@
             </div>
         </section>
 
-        <section id="webhook-structure">
+        <section id="estrutura-webhook">
             <div class="section-title">
                 <div class="section-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -824,8 +691,8 @@
                 </div>
                 <h2 class="mb-0">Webhook Structure</h2>
             </div>
-            
-            <p>When an event occurs, Genfity sends a POST request to the configured webhook with the event data. Below are the formats of the main event types:</p>
+
+            <p>When an event occurs, Genfity WA sends a POST request to the configured webhook with the event data. Below are the formats of the main event types:</p>
 
             <h3>Received Message</h3>
             <pre><code class="language-json">{
@@ -833,13 +700,13 @@
   "instance": "5491155553934.0:53@s.whatsapp.net",
   "data": {
     "id": "3EB0ABCD123456789",
-    "pushName": "Contact Name",
+    "pushName": "Nome do Contato",
     "fromMe": false,
     "timestamp": 1647878528,
     "chat": "5491199999999@s.whatsapp.net",
     "sender": "5491199999999@s.whatsapp.net",
     "message": {
-      "conversation": "Hello, how are you?"
+      "conversation": "Olá, como vai?"
     }
   }
 }</code></pre>
@@ -868,7 +735,7 @@
 }</code></pre>
 
             <div class="alert alert-info">
-                <strong>Note:</strong> Make sure your webhook server responds to requests with a 200 code in a reasonable time. Genfity considers a successful response as confirmation that the event has been processed correctly.
+                <strong>Note:</strong> Make sure your webhook server responds to requests with a 200 code in a reasonable time. Genfity WA considers a successful response as confirmation that the event was processed correctly.
             </div>
         </section>
 
@@ -882,7 +749,7 @@
                 </div>
                 <h2 class="mb-0">Chat</h2>
             </div>
-            <p>Endpoints for sending messages and managing chat interactions.</p>
+            <p>Endpoints to send messages and manage chat interactions.</p>
 
             <div class="endpoint">
                 <h3><span class="method post">POST</span> <span class="path">/chat/send/text</span></h3>
@@ -924,7 +791,7 @@
                 <h4>Request Example:</h4>
                 <pre><code class="language-json">{
   "Phone": "5491155553935",
-  "Body": "Hello, how are you?",
+  "Body": "Olá, como você está?",
   "Id": "ABCDABCD1234",
   "ContextInfo": {
     "StanzaId": "3EB06F9067F80BAB89FF",
@@ -981,6 +848,95 @@
                     </tbody>
                 </table>
             </div>
+
+            <div class="endpoint">
+                <h3><span class="method get">GET</span> <span class="path">/chat/history</span></h3>
+                <p>Recover the message history of a specific chat. Returns the messages in reverse chronological order (most recent first).</p>
+                
+                <h4>Parâmetros de Query:</h4>
+                <table class="api-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="required">chat_jid</td>
+                            <td>string</td>
+                            <td>JID (WhatsApp ID) of the chat to retrieve the history</td>
+                        </tr>
+                        <tr>
+                            <td>limit</td>
+                            <td>integer</td>
+                            <td>Maximum number of messages to retrieve (default: 50, maximum: 1000)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h4>Request Example:</h4>
+                <pre><code class="language-bash">GET /chat/history?chat_jid=5491155553935@s.whatsapp.net&limit=10</code></pre>
+                
+                <h4>Resposta de Sucesso:</h4>
+                <pre><code class="language-json">{
+  "code": 200,
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "user_id": "abc123def456",
+      "chat_jid": "5491155553935@s.whatsapp.net",
+      "sender_jid": "5491155554444@s.whatsapp.net",
+      "message_id": "3EB0C767D26A1B5F7C83",
+      "timestamp": "2023-12-01T15:30:00Z",
+      "message_type": "text",
+      "text_content": "Olá, como você está?",
+      "media_link": ""
+    },
+    {
+      "id": 2,
+      "user_id": "abc123def456", 
+      "chat_jid": "5491155553935@s.whatsapp.net",
+      "sender_jid": "5491155553935@s.whatsapp.net",
+      "message_id": "4FB1D878E37B2C6G8D94",
+      "timestamp": "2023-12-01T15:25:00Z",
+      "message_type": "image",
+      "text_content": "Veja esta foto!",
+      "media_link": "https://example.com/media/image123.jpg"
+    }
+  ]
+}</code></pre>
+
+                <h4>Possible Errors:</h4>
+                <table class="api-table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>400</td>
+                            <td>Invalid request - chat_jid parameter required</td>
+                        </tr>
+                        <tr>
+                            <td>501</td>
+                            <td>Not implemented - message history is disabled</td>
+                        </tr>
+                        <tr>
+                            <td>500</td>
+                            <td>Internal server error</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="alert alert-info">
+                    <strong>Note:</strong> This endpoint requires message history to be enabled on the server. The history is automatically saved for messages sent and received after enabling this feature.
+                </div>
+            </div>
         </section>
 
         <section id="user">
@@ -992,7 +948,7 @@
                 </div>
                 <h2 class="mb-0">User</h2>
             </div>
-            <p>Endpoints for getting user information and managing presence.</p>
+            <p>Endpoints to get information about users and manage presence.</p>
 
             <div class="endpoint">
                 <h3><span class="method post">POST</span> <span class="path">/user/check</span></h3>
@@ -1054,11 +1010,11 @@
                 </div>
                 <h2 class="mb-0">Group</h2>
             </div>
-            <p>Endpoints for managing groups and their properties.</p>
+            <p>Endpoints to manage groups and their properties.</p>
 
             <div class="endpoint">
                 <h3><span class="method get">GET</span> <span class="path">/group/list</span></h3>
-                <p>Lists all groups that the account is linked to.</p>
+                <p>Lists all groups to which the account is linked.</p>
                 
                 <h4>Response:</h4>
                 <pre><code class="language-json">{
@@ -1111,7 +1067,7 @@
                 </div>
                 <h2 class="mb-0">Newsletter</h2>
             </div>
-            <p>Endpoints for accessing WhatsApp newsletters.</p>
+            <p>Endpoints to access WhatsApp newsletters.</p>
 
             <div class="endpoint">
                 <h3><span class="method get">GET</span> <span class="path">/newsletter/list</span></h3>
@@ -1143,7 +1099,61 @@
             </div>
         </section>
 
-        <section id="s3config">
+        <section id="admin">
+            <div class="section-title">
+                <div class="section-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
+                    </svg>
+                </div>
+                <h2 class="mb-0">Admin</h2>
+            </div>
+            <p>Administrative endpoints to manage users and instances.</p>
+
+            <div class="endpoint">
+                <h3><span class="method get">GET</span> <span class="path">/admin/users</span></h3>
+                <p>Lists all users registered in the system.</p>
+                
+                <h4>Headers:</h4>
+                <table class="api-table">
+                    <thead>
+                        <tr>
+                            <th>Header</th>
+                            <th>Value</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="required">Authorization</td>
+                            <td>string</td>
+                            <td>Administrative token for authentication</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h4>Response:</h4>
+                <pre><code class="language-json">{
+  "code": 200,
+  "data": [
+    {
+      "id": 1,
+      "name": "John",
+      "token": "1234ABCD",
+      "webhook": "https://example.com/webhook",
+      "jid": "5491155553934@s.whatsapp.net",
+      "qrcode": "",
+      "connected": true,
+      "expiration": 0,
+      "events": "Message,ReadReceipt"
+    }
+  ],
+  "success": true
+}</code></pre>
+            </div>
+        </section>
+
+        <section id="s3-config">
             <div class="section-title">
                 <div class="section-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -1164,7 +1174,7 @@
   "code": 200,
   "data": {
     "endpoint": "https://s3.amazonaws.com",
-    "bucket": "my-bucket",
+    "bucket": "meu-bucket",
     "region": "us-east-1",
     "path_prefix": "uploads/whatsapp/",
     "force_path_style": false
@@ -1230,7 +1240,7 @@
   "endpoint": "https://s3.amazonaws.com",
   "access_key": "AKIAIOSFODNN7EXAMPLE",
   "secret_key": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
-  "bucket": "my-whatsapp-bucket",
+  "bucket": "meu-bucket-whatsapp",
   "region": "us-east-1",
   "path_prefix": "uploads/",
   "force_path_style": false
@@ -1248,7 +1258,7 @@
 
             <div class="endpoint">
                 <h3><span class="method post">POST</span> <span class="path">/s3/test</span></h3>
-                <p>Tests the S3 connection using the provided configuration.</p>
+                <p>Tests the connection to S3 using the provided configuration.</p>
                 
                 <h4>Body Parameters:</h4>
                 <p>Same parameters as PUT /s3/config endpoint</p>
@@ -1267,13 +1277,13 @@
                 <strong>Configuration Examples:</strong>
                 <ul>
                     <li><strong>AWS S3:</strong> Use the default endpoint and specify the region</li>
-                    <li><strong>MinIO:</strong> Use your custom endpoint (e.g. http://localhost:9000) and enable force_path_style</li>
+                    <li><strong>MinIO:</strong> Use your custom endpoint (ex: http://localhost:9000) and enable force_path_style</li>
                     <li><strong>DigitalOcean Spaces:</strong> Use https://nyc3.digitaloceanspaces.com as endpoint</li>
                 </ul>
             </div>
         </section>
 
-        <section id="proxyconfig">
+        <section id="proxy-config">
             <div class="section-title">
                 <div class="section-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -1317,7 +1327,7 @@
                         <tr>
                             <td class="required">proxy_url</td>
                             <td>string</td>
-                            <td>Complete proxy URL including protocol and port</td>
+                            <td>Full proxy URL including protocol and port</td>
                         </tr>
                         <tr>
                             <td>username</td>
@@ -1340,8 +1350,8 @@
                 <h4>Request Example:</h4>
                 <pre><code class="language-json">{
   "proxy_url": "socks5://proxy.example.com:1080",
-  "username": "user",
-  "password": "password123",
+  "username": "usuario",
+  "password": "senha123",
   "bypass_list": ["localhost", "127.0.0.1", "*.local", "192.168.*"]
 }</code></pre>
                 
@@ -1374,7 +1384,7 @@
             </div>
 
             <div class="alert alert-warning">
-                <strong>Supported URL formats:</strong>
+                <strong>Supported URL Formats:</strong>
                 <ul>
                     <li><strong>HTTP/HTTPS:</strong> <code>http://proxy.example.com:8080</code></li>
                     <li><strong>SOCKS5:</strong> <code>socks5://proxy.example.com:1080</code></li>
@@ -1383,7 +1393,7 @@
             </div>
         </section>
 
-        <section id="best-practices">
+        <section id="melhores-praticas">
             <div class="section-title">
                 <div class="section-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -1393,9 +1403,9 @@
                 </div>
                 <h2 class="mb-0">Best Practices</h2>
             </div>
-            
-            <p>To use the Genfity API efficiently and avoid problems, consider these best practices:</p>
-            
+
+            <p>To use the Genfity WA API efficiently and avoid problems, consider these best practices:</p>
+
             <h3>Security</h3>
             <ul>
                 <li>Keep your authentication tokens secure and do not expose them publicly.</li>
@@ -1405,15 +1415,15 @@
             
             <h3>Usage Limits</h3>
             <ul>
-                <li>Avoid sending too many messages in a short period to prevent blocking by WhatsApp.</li>
+                <li>Avoid sending many messages in a short period to avoid blocks from WhatsApp.</li>
                 <li>Implement retry mechanisms with exponential backoff to handle temporary failures.</li>
                 <li>Monitor connection status regularly and reconnect when necessary.</li>
             </ul>
             
             <h3>Webhooks</h3>
             <ul>
-                <li>Ensure your webhook endpoint can process requests quickly (less than 5 seconds).</li>
-                <li>Implement a queue to process events asynchronously if processing takes time.</li>
+                <li>Make sure your webhook endpoint can process requests quickly (less than 5 seconds).</li>
+                <li>Implement a queue to process events asynchronously if processing is time-consuming.</li>
                 <li>Configure your server to handle traffic spikes, especially if you manage multiple numbers.</li>
             </ul>
         </section>
@@ -1426,11 +1436,11 @@
                         <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
                     </svg>
                 </div>
-                <h2 class="mb-0">Frequently Asked Questions</h2>
+                <h2 class="mb-0">FAQ</h2>
             </div>
-            
+
             <div class="accordion mt-4" id="faqAccordion">
-                <!-- <div class="accordion-item">
+                <div class="accordion-item">
                     <h2 class="accordion-header" id="headingOne">
                         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                             Is it possible to connect more than one WhatsApp number?
@@ -1438,11 +1448,11 @@
                     </h2>
                     <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
                         <div class="accordion-body">
-                            Yes, Genfity supports multiple instances. Each instance has its own token and can connect to a different WhatsApp number. You can manage all instances through the management panel.
+                            Yes, Genfity WA supports multiple instances. Each instance has its own token and can connect to a different WhatsApp number. You can manage all instances through the administrative panel.
                         </div>
                     </div>
-                </div> -->
-                
+                </div>
+
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingTwo">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
@@ -1451,11 +1461,11 @@
                     </h2>
                     <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
                         <div class="accordion-body">
-                            If WhatsApp disconnects your session (for example, when connecting in the app or clicking "Log out from all devices"), you will need to reconnect through the <code>/session/connect</code> endpoint and scan the QR again. Genfity does not automatically reconnect in case of forced logout.
+                            If WhatsApp disconnects your session (for example, when connecting in the app or clicking "Log out from all devices"), you will need to reconnect through the <code>/session/connect</code> endpoint and scan the QR again. Genfity WA does not automatically reconnect in case of forced logout.
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingThree">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
@@ -1464,12 +1474,12 @@
                     </h2>
                     <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
                         <div class="accordion-body">
-                            <p>To reduce the risk of blocking:</p>
+                            <p>To reduce the risk of being blocked:</p>
                             <ul>
                                 <li>Do not send mass messages to people who don't know you</li>
                                 <li>Do not send the same message to many contacts in sequence</li>
                                 <li>Respect sending limits (approximately 50-100 messages per day for new numbers)</li>
-                                <li>Use a number that already has a history of use on WhatsApp</li>
+                                <li>Use a number that already has usage history on WhatsApp</li>
                                 <li>Do not use the API to send spam or inappropriate content</li>
                             </ul>
                         </div>
@@ -1538,3 +1548,4 @@
     </script>
 </body>
 </html>
+

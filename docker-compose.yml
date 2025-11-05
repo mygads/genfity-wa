@@ -3,74 +3,77 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: genfity-wa
-    environment:
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
-      - DB_SSLMODE=${DB_SSLMODE}
-      - PORT=${PORT}
-      - TZ=${TZ}
-      - WUZAPI_ADMIN_TOKEN=${WUZAPI_ADMIN_TOKEN}
-      - WEBHOOK_FORMAT=${WEBHOOK_FORMAT}
-      - SESSION_DEVICE_NAME=${SESSION_DEVICE_NAME}
-      - GIN_MODE=${GIN_MODE}
-      - LOG_LEVEL=${LOG_LEVEL}
     ports:
-      - "${PORT}:${PORT}"
-    networks:
-      - genfity-network
-    depends_on:
-      - db-check
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "--no-verbose", "--tries=1", "--spider", "http://localhost:${PORT}/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-  db-check:
-    image: postgres:16
-    container_name: genfity-db-check
+      - "${GENFITY_PORT:-8080}:8080"
     environment:
-      - PGHOST=${DB_HOST}
-      - PGPORT=${DB_PORT}
-      - PGUSER=${DB_USER}
-      - PGPASSWORD=${DB_PASSWORD}
-      - PGDATABASE=${DB_NAME}
+      - GENFITY_ADMIN_TOKEN=${GENFITY_ADMIN_TOKEN}
+      - GENFITY_GLOBAL_ENCRYPTION_KEY=${GENFITY_GLOBAL_ENCRYPTION_KEY}
+      - GENFITY_GLOBAL_HMAC_KEY=${GENFITY_GLOBAL_HMAC_KEY:-}
+      - GENFITY_GLOBAL_WEBHOOK=${GENFITY_GLOBAL_WEBHOOK:-}
+      - DB_USER=${DB_USER:-genfity}
+      - DB_PASSWORD=${DB_PASSWORD:-genfity}
+      - DB_NAME=${DB_NAME:-genfity}
+      - DB_HOST=db
+      - DB_PORT=${DB_PORT:-5432}
+      - TZ=${TZ:-America/Sao_Paulo}
+      - WEBHOOK_FORMAT=${WEBHOOK_FORMAT:-json}
+      - SESSION_DEVICE_NAME=${SESSION_DEVICE_NAME:-Genfity}
+      # RabbitMQ configuration Optional
+      - RABBITMQ_URL=amqp://genfity:genfity@rabbitmq:5672/
+      - RABBITMQ_QUEUE=whatsapp_events
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     networks:
       - genfity-network
-    command: >
-      sh -c "
-        echo 'Checking database connection...'
-        until pg_isready -h ${DB_HOST} -p ${DB_PORT} -U ${DB_USER} -d postgres; do
-          echo 'Waiting for PostgreSQL server...'
-          sleep 2
-        done
-        echo 'PostgreSQL server is ready!'
-        
-        echo 'Checking if database exists...'
-        if psql -h ${DB_HOST} -U ${DB_USER} -d postgres -lqt | cut -d \\| -f 1 | grep -qw ${DB_NAME}; then
-          echo 'Database ${DB_NAME} exists'
-        else
-          echo 'Database ${DB_NAME} does not exist, creating...'
-          psql -h ${DB_HOST} -U ${DB_USER} -d postgres -c 'CREATE DATABASE ${DB_NAME};'
-          echo 'Database ${DB_NAME} created'
-        fi
-        
-        echo 'Database check completed successfully'
-      "
+    restart: on-failure
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${DB_USER:-genfity}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-genfity}
+      POSTGRES_DB: ${DB_NAME:-genfity}
+    # ports:
+    #   - "${DB_PORT:-5432}:5432" # Uncomment to access the database directly from your host machine.
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - genfity-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-genfity}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: genfity
+      RABBITMQ_DEFAULT_PASS: genfity
+      RABBITMQ_DEFAULT_VHOST: /
+    ports:
+      - "5672:5672" # AMQP port
+      - "15672:15672" # Management UI port
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - genfity-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
 
 networks:
   genfity-network:
-    external: true
-    name: server_genfity-network
+    driver: bridge
 
-# ==========================================
-# Usage:
-#   Copy .env.example to .env and configure
-#   Then run: docker compose up -d
-# ==========================================
+volumes:
+  db_data:
+  rabbitmq_data:

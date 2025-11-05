@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"math/rand"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -34,34 +35,130 @@ type server struct {
 
 // Replace the global variables
 var (
-	address       = flag.String("address", "0.0.0.0", "Bind IP Address")
-	port          = flag.String("port", "8080", "Listen Port")
-	waDebug       = flag.String("wadebug", "", "Enable whatsmeow debug (INFO or DEBUG)")
-	logType       = flag.String("logtype", "console", "Type of log output (console or json)")
-	skipMedia     = flag.Bool("skipmedia", false, "Do not attempt to download media in messages")
-	osName        = flag.String("osname", "Mac OS 10", "Connection OSName in Whatsapp")
-	colorOutput   = flag.Bool("color", false, "Enable colored output for console logs")
-	sslcert       = flag.String("sslcertificate", "", "SSL Certificate File")
-	sslprivkey    = flag.String("sslprivatekey", "", "SSL Certificate Private Key File")
-	adminToken    = flag.String("admintoken", "", "Security Token to authorize admin actions (list/create/remove users)")
-	globalWebhook = flag.String("globalwebhook", "", "Global webhook URL to receive all events from all users")
-	versionFlag   = flag.Bool("version", false, "Display version information and exit")
+	address             = flag.String("address", "0.0.0.0", "Bind IP Address")
+	port                = flag.String("port", "8080", "Listen Port")
+	waDebug             = flag.String("wadebug", "", "Enable whatsmeow debug (INFO or DEBUG)")
+	logType             = flag.String("logtype", "console", "Type of log output (console or json)")
+	skipMedia           = flag.Bool("skipmedia", false, "Do not attempt to download media in messages")
+	osName              = flag.String("osname", "Mac OS 10", "Connection OSName in Whatsapp")
+	colorOutput         = flag.Bool("color", false, "Enable colored output for console logs")
+	sslcert             = flag.String("sslcertificate", "", "SSL Certificate File")
+	sslprivkey          = flag.String("sslprivatekey", "", "SSL Certificate Private Key File")
+	adminToken          = flag.String("admintoken", "", "Security Token to authorize admin actions (list/create/remove users)")
+	globalEncryptionKey = flag.String("globalencryptionkey", "", "Encryption key for sensitive data (32 bytes)")
+	globalHMACKey       = flag.String("globalhmackey", "", "Global HMAC key for webhook signing")
+	globalWebhook       = flag.String("globalwebhook", "", "Global webhook URL to receive all events from all users")
+	versionFlag         = flag.Bool("version", false, "Display version information and exit")
+
+	globalHMACKeyEncrypted []byte
 
 	container        *sqlstore.Container
 	clientManager    = NewClientManager()
 	killchannel      = make(map[string](chan bool))
 	userinfocache    = cache.New(5*time.Minute, 10*time.Minute)
 	lastMessageCache = cache.New(24*time.Hour, 24*time.Hour)
+	globalHTTPClient = newSafeHTTPClient()
 )
 
-const version = "1.0.1"
+var privateIPBlocks []*net.IPNet
+
+const version = "1.0.4"
+
+func newSafeHTTPClient() *http.Client {
+	return &http.Client{
+		Timeout: 60 * time.Second,
+		Transport: &http.Transport{
+			DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+				host, port, err := net.SplitHostPort(addr)
+				if err != nil {
+					return nil, fmt.Errorf("unexpected address format from http transport: %q: %w", addr, err)
+				}
+
+				ips, err := net.LookupIP(host)
+				if err != nil {
+					return nil, fmt.Errorf("failed to resolve host '%s': %w", host, err)
+				}
+				if len(ips) == 0 {
+					return nil, fmt.Errorf("no IP addresses found for host: %s", host)
+				}
+
+				var (
+					lastDialErr   error
+					ssrfDetected  bool
+					ssrfLastError error
+				)
+
+				for _, ip := range ips {
+					if isPrivateOrLoopback(ip) {
+						log.Warn().Str("ip", ip.String()).Str("host", host).Msg("SSRF attempt detected: refused to connect to private or local address")
+						ssrfDetected = true
+						if ssrfLastError == nil {
+							ssrfLastError = fmt.Errorf("ssrf attempt detected: host '%s' resolves to one or more private IP addresses", host)
+						}
+						continue
+					}
+
+					dialer := &net.Dialer{
+						Timeout:   4 * time.Second,
+						KeepAlive: 30 * time.Second,
+					}
+
+					connAddr := net.JoinHostPort(ip.String(), port)
+					conn, err := dialer.DialContext(ctx, network, connAddr)
+					if err == nil {
+						return conn, nil
+					}
+					lastDialErr = err
+				}
+
+				if lastDialErr != nil {
+					return nil, lastDialErr
+				}
+				if ssrfDetected {
+					return nil, ssrfLastError
+				}
+				if lastDialErr != nil {
+					return nil, lastDialErr
+				}
+				return nil, fmt.Errorf("no dialable IP addresses found for host %s", host)
+			},
+		},
+	}
+}
+
+func isPrivateOrLoopback(ip net.IP) bool {
+	if ip.IsLoopback() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() {
+		return true
+	}
+	for _, block := range privateIPBlocks {
+		if block.Contains(ip) {
+			return true
+		}
+	}
+	return false
+}
 
 func init() {
-	// Load .env only if present (avoid noisy warning inside container where variables are injected by Docker)
-	if _, statErr := os.Stat(".env"); statErr == nil {
-		if loadErr := godotenv.Load(); loadErr != nil {
-			log.Warn().Err(loadErr).Msg("Failed to load .env file")
+	for _, cidr := range []string{
+		"127.0.0.0/8",    // IPv4 loopback
+		"10.0.0.0/8",     // RFC1918
+		"172.16.0.0/12",  // RFC1918
+		"192.168.0.0/16", // RFC1918
+		"100.64.0.0/10",  // RFC6598 Carrier-Grade NAT
+		"169.254.0.0/16", // RFC3927 link-local
+		"::1/128",        // IPv6 loopback
+		"fe80::/10",      // IPv6 link-local
+	} {
+		_, block, err := net.ParseCIDR(cidr)
+		if err != nil {
+			log.Fatal().Err(err).Msgf("Failed to parse CIDR string: %s", cidr)
 		}
+		privateIPBlocks = append(privateIPBlocks, block)
+	}
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Warn().Err(err).Msg("It was not possible to load the .env file (it may not exist).")
 	}
 
 	flag.Parse()
@@ -72,7 +169,7 @@ func init() {
 	}
 
 	if *versionFlag {
-		fmt.Printf("WA version %s\n", version)
+		fmt.Printf("Genfity WA version %s\n", version)
 		os.Exit(0)
 	}
 	tz := os.Getenv("TZ")
@@ -126,7 +223,10 @@ func init() {
 	}
 
 	if *adminToken == "" {
-		if v := os.Getenv("WA_ADMIN_TOKEN"); v != "" {
+		// Try GENFITY_ADMIN_TOKEN first, then fallback to WA_ADMIN_TOKEN for backward compatibility
+		if v := os.Getenv("GENFITY_ADMIN_TOKEN"); v != "" {
+			*adminToken = v
+		} else if v := os.Getenv("WA_ADMIN_TOKEN"); v != "" {
 			*adminToken = v
 		} else {
 			// Generate a random token if none provided
@@ -140,14 +240,70 @@ func init() {
 		}
 	}
 
+	if *globalEncryptionKey == "" {
+		// Try GENFITY_GLOBAL_ENCRYPTION_KEY first, then fallback to WA_GLOBAL_ENCRYPTION_KEY
+		if v := os.Getenv("GENFITY_GLOBAL_ENCRYPTION_KEY"); v != "" {
+			*globalEncryptionKey = v
+			log.Info().Msg("Encryption key loaded from environment variable")
+		} else if v := os.Getenv("WA_GLOBAL_ENCRYPTION_KEY"); v != "" {
+			*globalEncryptionKey = v
+			log.Info().Msg("Encryption key loaded from environment variable (WA_GLOBAL_ENCRYPTION_KEY)")
+		} else {
+			// Generate a random key if none provided
+			const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+			b := make([]byte, 32)
+			for i := range b {
+				b[i] = charset[rand.Intn(len(charset))]
+			}
+			*globalEncryptionKey = string(b)
+			log.Warn().Str("global_encryption_key", *globalEncryptionKey).Msg("No GENFITY_GLOBAL_ENCRYPTION_KEY or WA_GLOBAL_ENCRYPTION_KEY provided, generated a random one. " +
+				"SAVE THIS KEY TO YOUR .ENV FILE OR ALL ENCRYPTED DATA WILL BE LOST ON RESTART!")
+		}
+	}
+
 	// Check for global webhook in environment variable
 	if *globalWebhook == "" {
-		if v := os.Getenv("WA_GLOBAL_WEBHOOK"); v != "" {
+		// Try GENFITY_GLOBAL_WEBHOOK first, then fallback to WA_GLOBAL_WEBHOOK
+		if v := os.Getenv("GENFITY_GLOBAL_WEBHOOK"); v != "" {
 			*globalWebhook = v
 			log.Info().Str("global_webhook", v).Msg("Global webhook configured from environment variable")
+		} else if v := os.Getenv("WA_GLOBAL_WEBHOOK"); v != "" {
+			*globalWebhook = v
+			log.Info().Str("global_webhook", v).Msg("Global webhook configured from environment variable (WA_GLOBAL_WEBHOOK)")
 		}
 	} else {
 		log.Info().Str("global_webhook", *globalWebhook).Msg("Global webhook configured from command line")
+	}
+
+	// Check for global HMAC key in environment variable
+	if *globalHMACKey == "" {
+		// Try GENFITY_GLOBAL_HMAC_KEY first, then fallback to WA_GLOBAL_HMAC_KEY
+		if v := os.Getenv("GENFITY_GLOBAL_HMAC_KEY"); v != "" {
+			*globalHMACKey = v
+			log.Info().Msg("Global HMAC key configured from environment variable")
+		} else if v := os.Getenv("WA_GLOBAL_HMAC_KEY"); v != "" {
+			*globalHMACKey = v
+			log.Info().Msg("Global HMAC key configured from environment variable (WA_GLOBAL_HMAC_KEY)")
+		} else {
+			// Generate a random key if none provided
+			const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+			b := make([]byte, 32)
+			for i := range b {
+				b[i] = charset[rand.Intn(len(charset))]
+			}
+			*globalHMACKey = string(b)
+			log.Warn().Str("global_hmac_key", *globalHMACKey).Msg("No GENFITY_GLOBAL_HMAC_KEY or WA_GLOBAL_HMAC_KEY provided, generated a random one")
+		}
+
+	} else {
+		log.Info().Msg("Global HMAC key configured from command line")
+	}
+
+	globalHMACKeyEncrypted, err = encryptHMACKey(*globalHMACKey)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to encrypt global HMAC key")
+	} else {
+		log.Info().Msg("Global HMAC key encrypted successfully")
 	}
 
 	InitRabbitMQ()
@@ -182,8 +338,6 @@ func main() {
 		}
 		os.Exit(1)
 	}
-
-	log.Info().Msg("✅ Database schema initialized successfully")
 
 	var dbLog waLog.Logger
 	if *waDebug != "" {

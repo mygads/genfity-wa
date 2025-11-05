@@ -62,6 +62,7 @@ var supportedEventTypes = []string{
 	"ConnectFailure",
 	"KeepAliveRestored",
 	"KeepAliveTimeout",
+	"QRTimeout",
 	"LoggedOut",
 	"ClientOutdated",
 	"TemporaryBan",
