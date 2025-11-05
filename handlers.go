@@ -550,6 +550,36 @@ func (s *server) SetWebhook() http.HandlerFunc {
 	}
 }
 
+// GetWebhookEvents returns the list of available webhook events
+func (s *server) GetWebhookEvents() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Check if user wants only active events
+		onlyActive := r.URL.Query().Get("active")
+
+		response := map[string]interface{}{
+			"active_events":          activeEventTypes,
+			"all_supported_events":   supportedEventTypes,
+			"not_implemented_events": notImplementedEventTypes,
+		}
+
+		// If only active events are requested, return only those
+		if onlyActive == "true" {
+			response = map[string]interface{}{
+				"events": activeEventTypes,
+				"status": "active_only",
+			}
+		}
+
+		responseJson, err := json.Marshal(response)
+		if err != nil {
+			s.Respond(w, r, http.StatusInternalServerError, err)
+		} else {
+			s.Respond(w, r, http.StatusOK, string(responseJson))
+		}
+		return
+	}
+}
+
 // Gets QR code encoded in Base64
 func (s *server) GetQR() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
