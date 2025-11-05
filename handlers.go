@@ -941,6 +941,10 @@ func (s *server) SendDocument() http.HandlerFunc {
 		historyLimit, _ := strconv.Atoi(historyStr)
 		s.saveOutgoingMessageToHistory(txtid, recipient.String(), msgid, "document", t.Caption, "", historyLimit)
 
+		// Send webhook for sent message
+		token := r.Context().Value("userinfo").(Values).Get("Token")
+		go sendMessageSentWebhook(txtid, token, msgid, resp.Timestamp, recipient, msg, "document")
+
 		log.Info().Str("timestamp", fmt.Sprintf("%v", resp.Timestamp)).Str("id", msgid).Msg("Message sent")
 		response := map[string]interface{}{"Details": "Sent", "Timestamp": resp.Timestamp.Unix(), "Id": msgid}
 		responseJson, err := json.Marshal(response)
@@ -1093,6 +1097,10 @@ func (s *server) SendAudio() http.HandlerFunc {
 		historyStr := r.Context().Value("userinfo").(Values).Get("History")
 		historyLimit, _ := strconv.Atoi(historyStr)
 		s.saveOutgoingMessageToHistory(txtid, recipient.String(), msgid, "audio", "", "", historyLimit)
+
+		// Send webhook for sent message
+		token := r.Context().Value("userinfo").(Values).Get("Token")
+		go sendMessageSentWebhook(txtid, token, msgid, resp.Timestamp, recipient, msg, "audio")
 
 		log.Info().Str("timestamp", fmt.Sprintf("%v", resp.Timestamp)).Str("id", msgid).Msg("Message sent")
 		response := map[string]interface{}{"Details": "Sent", "Timestamp": resp.Timestamp.Unix(), "Id": msgid}
@@ -1281,6 +1289,10 @@ func (s *server) SendImage() http.HandlerFunc {
 		historyLimit, _ := strconv.Atoi(historyStr)
 		s.saveOutgoingMessageToHistory(txtid, recipient.String(), msgid, "image", t.Caption, "", historyLimit)
 
+		// Send webhook for sent message
+		token := r.Context().Value("userinfo").(Values).Get("Token")
+		go sendMessageSentWebhook(txtid, token, msgid, resp.Timestamp, recipient, msg, "image")
+
 		log.Info().Str("timestamp", fmt.Sprintf("%v", resp.Timestamp)).Str("id", msgid).Msg("Message sent")
 		response := map[string]interface{}{"Details": "Sent", "Timestamp": resp.Timestamp.Unix(), "Id": msgid}
 		responseJson, err := json.Marshal(response)
@@ -1414,6 +1426,10 @@ func (s *server) SendSticker() http.HandlerFunc {
 		historyStr := r.Context().Value("userinfo").(Values).Get("History")
 		historyLimit, _ := strconv.Atoi(historyStr)
 		s.saveOutgoingMessageToHistory(txtid, recipient.String(), msgid, "sticker", "", "", historyLimit)
+
+		// Send webhook for sent message
+		token := r.Context().Value("userinfo").(Values).Get("Token")
+		go sendMessageSentWebhook(txtid, token, msgid, resp.Timestamp, recipient, msg, "sticker")
 
 		log.Info().Str("timestamp", fmt.Sprintf("%v", resp.Timestamp)).Str("id", msgid).Msg("Message sent")
 		response := map[string]interface{}{"Details": "Sent", "Timestamp": resp.Timestamp.Unix(), "Id": msgid}
@@ -1571,6 +1587,10 @@ func (s *server) SendVideo() http.HandlerFunc {
 		historyLimit, _ := strconv.Atoi(historyStr)
 		s.saveOutgoingMessageToHistory(txtid, recipient.String(), msgid, "video", t.Caption, "", historyLimit)
 
+		// Send webhook for sent message
+		token := r.Context().Value("userinfo").(Values).Get("Token")
+		go sendMessageSentWebhook(txtid, token, msgid, resp.Timestamp, recipient, msg, "video")
+
 		log.Info().Str("timestamp", fmt.Sprintf("%v", resp.Timestamp)).Str("id", msgid).Msg("Message sent")
 		response := map[string]interface{}{"Details": "Sent", "Timestamp": resp.Timestamp.Unix(), "Id": msgid}
 		responseJson, err := json.Marshal(response)
@@ -1674,6 +1694,10 @@ func (s *server) SendContact() http.HandlerFunc {
 		historyStr := r.Context().Value("userinfo").(Values).Get("History")
 		historyLimit, _ := strconv.Atoi(historyStr)
 		s.saveOutgoingMessageToHistory(txtid, recipient.String(), msgid, "contact", t.Name, "", historyLimit)
+
+		// Send webhook for sent message
+		token := r.Context().Value("userinfo").(Values).Get("Token")
+		go sendMessageSentWebhook(txtid, token, msgid, resp.Timestamp, recipient, msg, "contact")
 
 		log.Info().Str("timestamp", fmt.Sprintf("%v", resp.Timestamp)).Str("id", msgid).Msg("Message sent")
 		response := map[string]interface{}{"Details": "Sent", "Timestamp": resp.Timestamp.Unix(), "Id": msgid}
@@ -1781,6 +1805,10 @@ func (s *server) SendLocation() http.HandlerFunc {
 		historyLimit, _ := strconv.Atoi(historyStr)
 		s.saveOutgoingMessageToHistory(txtid, recipient.String(), msgid, "location", t.Name, "", historyLimit)
 
+		// Send webhook for sent message
+		token := r.Context().Value("userinfo").(Values).Get("Token")
+		go sendMessageSentWebhook(txtid, token, msgid, resp.Timestamp, recipient, msg, "location")
+
 		log.Info().Str("timestamp", fmt.Sprintf("%v", resp.Timestamp)).Str("id", msgid).Msg("Message sent")
 		response := map[string]interface{}{"Details": "Sent", "Timestamp": resp.Timestamp.Unix(), "Id": msgid}
 		responseJson, err := json.Marshal(response)
@@ -1884,6 +1912,11 @@ func (s *server) SendButtons() http.HandlerFunc {
 			s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("error sending message: %v", err)))
 			return
 		}
+
+		// Send webhook for sent message
+		token := r.Context().Value("userinfo").(Values).Get("Token")
+		buttonsMsg := &waE2E.Message{ButtonsMessage: msg2}
+		go sendMessageSentWebhook(txtid, token, msgid, resp.Timestamp, recipient, buttonsMsg, "buttons")
 
 		log.Info().Str("timestamp", fmt.Sprintf("%v", resp.Timestamp)).Str("id", msgid).Msg("Message sent")
 		response := map[string]interface{}{"Details": "Sent", "Timestamp": resp.Timestamp.Unix(), "Id": msgid}
@@ -2032,6 +2065,10 @@ func (s *server) SendList() http.HandlerFunc {
 			s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("error sending message: %v", err)))
 			return
 		}
+
+		// Send webhook for sent message
+		token := r.Context().Value("userinfo").(Values).Get("Token")
+		go sendMessageSentWebhook(txtid, token, msgid, resp.Timestamp, recipient, msg, "list")
 
 		log.Info().Str("timestamp", fmt.Sprintf("%v", resp.Timestamp)).Str("id", msgid).Msg("Message list sent")
 		response := map[string]interface{}{
@@ -2219,6 +2256,10 @@ func (s *server) SendMessage() http.HandlerFunc {
 		historyLimit, _ := strconv.Atoi(historyStr)
 		s.saveOutgoingMessageToHistory(txtid, recipient.String(), msgid, "text", t.Body, "", historyLimit)
 
+		// Send webhook for sent message
+		token := r.Context().Value("userinfo").(Values).Get("Token")
+		go sendMessageSentWebhook(txtid, token, msgid, resp.Timestamp, recipient, msg, "text")
+
 		log.Info().Str("timestamp", fmt.Sprintf("%v", resp.Timestamp)).Str("id", msgid).Msg("Message sent")
 		response := map[string]interface{}{"Details": "Sent", "Timestamp": resp.Timestamp.Unix(), "Id": msgid}
 		responseJson, err := json.Marshal(response)
@@ -2292,6 +2333,10 @@ func (s *server) SendPoll() http.HandlerFunc {
 			s.Respond(w, r, http.StatusInternalServerError, errors.New(fmt.Sprintf("failed to send poll: %v", err)))
 			return
 		}
+
+		// Send webhook for sent message
+		token := r.Context().Value("userinfo").(Values).Get("Token")
+		go sendMessageSentWebhook(txtid, token, msgid, resp.Timestamp, recipient, pollMessage, "poll")
 
 		log.Info().Str("timestamp", fmt.Sprintf("%v", resp.Timestamp)).Str("id", msgid).Msg("Poll sent")
 
