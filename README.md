@@ -21,6 +21,180 @@ Be very careful—do not use this to send SPAM or anything similar. Use at your 
 * **Groups:** Create, delete and list groups, get info, get invite links, set participants, change group photos and names.
 * **Webhooks:** Set and get webhooks that will be called whenever events or messages are received.
 * **HMAC Configuration:** Configure HMAC keys for webhook security and signature verification.
+* **History:** Configure and retrieve message history storage for analytics, backup, and audit purposes.
+
+## 🆕 New Features
+
+### 📊 Message History Storage
+
+Store and retrieve chat history in the database for:
+- 📈 Analytics and reporting
+- 🔍 Message search and retrieval
+- 💾 Backup and audit trail
+- 🤖 AI/Chatbot training data
+- 📊 Business intelligence
+
+#### Enable History Storage
+
+**Endpoint:** `POST /session/history`
+
+**Request:**
+```json
+{
+  "history": 500
+}
+```
+
+**Parameters:**
+- `history`: 0 = Disabled, 1-999999 = Maximum messages per chat (FIFO when limit reached)
+
+#### Retrieve Message History
+
+**Endpoint:** `GET /chat/history?chat_jid={jid}&limit={limit}`
+
+**Query Parameters:**
+- `chat_jid` (required): Chat JID or use `index` to get all chats mapping
+- `limit` (optional): Number of messages to retrieve (default: 50)
+
+**Example Response:**
+```json
+[
+  {
+    "id": 1234,
+    "user_id": "user_1",
+    "chat_jid": "628123456789@s.whatsapp.net",
+    "sender_jid": "628123456789@s.whatsapp.net",
+    "message_id": "3EB0123456789ABCDEF",
+    "timestamp": "2025-11-06T10:30:45Z",
+    "message_type": "text",
+    "text_content": "Hello world!",
+    "media_link": "",
+    "quoted_message_id": "",
+    "datajson": "{...}"
+  }
+]
+```
+
+### 🔔 MessageSent Webhook (Custom Genfity Feature)
+
+Automatically triggered when your application successfully sends a message. Subscribe to `MessageSent` event to receive notifications.
+
+**Webhook Payload:**
+```json
+{
+  "type": "MessageSent",
+  "event": {
+    "Info": {
+      "ID": "3EB0123456789ABCDEF",
+      "Timestamp": "2025-11-06T10:30:45Z",
+      "Chat": "628123456789@s.whatsapp.net",
+      "IsFromMe": true,
+      "MessageType": "text"
+    },
+    "Message": {
+      // Original message object
+    }
+  }
+}
+```
+
+**Message Types:** `text`, `image`, `video`, `audio`, `document`, `sticker`, `contact`, `location`, `buttons`, `list`, `poll`
+
+**Triggered by all send endpoints:**
+- `/chat/send/text`
+- `/chat/send/image`
+- `/chat/send/video`
+- `/chat/send/audio`
+- `/chat/send/document`
+- `/chat/send/sticker`
+- `/chat/send/contact`
+- `/chat/send/location`
+- `/chat/send/buttons`
+- `/chat/send/list`
+- `/chat/send/poll`
+
+### 🌐 URL Support for Images & Videos
+
+Send images and videos directly from URLs without base64 encoding!
+
+**Supported Endpoints:**
+- `POST /chat/send/image`
+- `POST /chat/send/video`
+
+**Example with URL:**
+```json
+{
+  "Phone": "628123456789@s.whatsapp.net",
+  "Image": "https://example.com/image.jpg",
+  "Caption": "Image from URL"
+}
+```
+
+**Example with Base64 (still supported):**
+```json
+{
+  "Phone": "628123456789@s.whatsapp.net",
+  "Image": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
+  "Caption": "Image from Base64"
+}
+```
+
+**Features:**
+- ✅ SSRF Protection (only http/https allowed)
+- ✅ Size limit validation (prevents DOS attacks)
+- ✅ Auto MIME-type detection
+- ✅ Backward compatible with Base64
+
+### 📋 Webhook Events List
+
+**Endpoint:** `GET /webhook/events?active=true`
+
+Get comprehensive list of all supported webhook events (no authentication required).
+
+**Response:**
+```json
+{
+  "active_events": [
+    "Message", "MessageSent", "Receipt", "Connected",
+    "Disconnected", "QR", "HistorySync", ...
+  ],
+  "all_supported_events": [...],
+  "not_implemented_events": [...]
+}
+```
+
+**Active Events:**
+- **Messages:** `Message`, `MessageSent`, `Receipt`
+- **Connection:** `Connected`, `Disconnected`, `ConnectFailure`, `LoggedOut`, `StreamReplaced`, `PairSuccess`, `QR`
+- **Privacy:** `PushNameSetting`
+- **Sync:** `AppState`, `AppStateSyncComplete`, `HistorySync`
+- **Calls:** `CallOffer`, `CallAccept`, `CallTerminate`, `CallOfferNotice`, `CallRelayLatency`
+- **Presence:** `Presence`, `ChatPresence`
+- **Special:** `All` (subscribe to all events)
+
+### 📱 WhatsApp Status Management
+
+**Endpoint:** `POST /status/set/text`
+
+Set your WhatsApp profile status message.
+
+**Request:**
+```json
+{
+  "Body": "Available - Powered by Genfity WA"
+}
+```
+
+### 🔗 Get User Linked ID (LID)
+
+**Endpoint:** `GET /user/lid/{jid}`
+
+Retrieve the Linked ID for a specific WhatsApp user.
+
+**Example:**
+```
+GET /user/lid/628123456789@s.whatsapp.net
+```
 
 ### Webhook HMAC Signing
 
