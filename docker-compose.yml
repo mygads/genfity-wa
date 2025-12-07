@@ -1,79 +1,87 @@
+# ===================================================================================
+# WHATSAPP API (GENFITY-WA) - DOCKER COMPOSE (LOCAL DEVELOPMENT)
+# ===================================================================================
+# 
+# Builds images locally from source code
+# All values MUST be set in .env file
+#
+# USAGE:
+#   cp .env.example .env   # Edit with your values
+#   docker compose up -d --build
+#
+# ===================================================================================
+
 services:
-  genfity-wa:
+  whatsapp-api:
     build:
       context: .
       dockerfile: Dockerfile
+    image: genfity-wa:local
+    container_name: wa-api
     ports:
-      - "${GENFITY_PORT:-8080}:8080"
+      - "8080:8080"
     environment:
-      - GENFITY_ADMIN_TOKEN=${GENFITY_ADMIN_TOKEN}
-      - GENFITY_GLOBAL_ENCRYPTION_KEY=${GENFITY_GLOBAL_ENCRYPTION_KEY}
-      - GENFITY_GLOBAL_HMAC_KEY=${GENFITY_GLOBAL_HMAC_KEY:-}
-      - GENFITY_GLOBAL_WEBHOOK=${GENFITY_GLOBAL_WEBHOOK:-}
-      - DB_USER=${DB_USER:-genfity}
-      - DB_PASSWORD=${DB_PASSWORD:-genfity}
-      - DB_NAME=${DB_NAME:-genfity}
-      - DB_HOST=db
-      - DB_PORT=${DB_PORT:-5432}
-      - TZ=${TZ:-America/Sao_Paulo}
-      - WEBHOOK_FORMAT=${WEBHOOK_FORMAT:-json}
-      - SESSION_DEVICE_NAME=${SESSION_DEVICE_NAME:-Genfity}
-      # RabbitMQ configuration Optional
-      - RABBITMQ_URL=amqp://genfity:genfity@rabbitmq:5672/
-      - RABBITMQ_QUEUE=whatsapp_events
-    depends_on:
-      db:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-    networks:
-      - genfity-network
-    restart: on-failure
-
-  db:
-    image: postgres:16
-    environment:
-      POSTGRES_USER: ${DB_USER:-genfity}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-genfity}
-      POSTGRES_DB: ${DB_NAME:-genfity}
-    # ports:
-    #   - "${DB_PORT:-5432}:5432" # Uncomment to access the database directly from your host machine.
+      # Database
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_SSLMODE: ${DB_SSLMODE}
+      
+      # Application
+      PORT: ${PORT}
+      TZ: ${TZ}
+      GIN_MODE: ${GIN_MODE}
+      LOG_LEVEL: ${LOG_LEVEL}
+      
+      # Authentication
+      WA_ADMIN_TOKEN: ${WA_ADMIN_TOKEN}
+      
+      # Security / Encryption
+      WA_GLOBAL_ENCRYPTION_KEY: ${WA_GLOBAL_ENCRYPTION_KEY:-}
+      WA_GLOBAL_HMAC_KEY: ${WA_GLOBAL_HMAC_KEY:-}
+      
+      # Webhook
+      WA_GLOBAL_WEBHOOK: ${WA_GLOBAL_WEBHOOK:-}
+      WEBHOOK_FORMAT: ${WEBHOOK_FORMAT}
+      
+      # Session
+      SESSION_DEVICE_NAME: ${SESSION_DEVICE_NAME}
+      
+      # RabbitMQ (Optional)
+      RABBITMQ_URL: ${RABBITMQ_URL:-}
+      RABBITMQ_QUEUE: ${RABBITMQ_QUEUE:-}
+      
+      # Webhook Retry (Optional)
+      WEBHOOK_RETRY_ENABLED: ${WEBHOOK_RETRY_ENABLED:-}
+      WEBHOOK_RETRY_COUNT: ${WEBHOOK_RETRY_COUNT:-}
+      WEBHOOK_RETRY_DELAY_SECONDS: ${WEBHOOK_RETRY_DELAY_SECONDS:-}
+      WEBHOOK_ERROR_QUEUE_NAME: ${WEBHOOK_ERROR_QUEUE_NAME:-}
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - wa-sessions:/app/sessions
+      - wa-static:/app/static
     networks:
-      - genfity-network
+      - wa-network
+      - infra-network
+    restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-genfity}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    restart: always
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    hostname: rabbitmq
-    environment:
-      RABBITMQ_DEFAULT_USER: genfity
-      RABBITMQ_DEFAULT_PASS: genfity
-      RABBITMQ_DEFAULT_VHOST: /
-    ports:
-      - "5672:5672" # AMQP port
-      - "15672:15672" # Management UI port
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-    networks:
-      - genfity-network
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: always
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
 networks:
-  genfity-network:
-    driver: bridge
+  wa-network:
+    external: true
+    name: wa-network
+  infra-network:
+    external: true
+    name: infra-network
 
 volumes:
-  db_data:
-  rabbitmq_data:
+  wa-sessions:
+    name: wa-sessions
+  wa-static:
+    name: wa-static

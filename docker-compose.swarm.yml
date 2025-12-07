@@ -1,0 +1,119 @@
+# ===================================================================================
+# WHATSAPP API (GENFITY-WA) - DOCKER COMPOSE (SWARM MODE)
+# ===================================================================================
+# 
+# High-availability deployment with Docker Swarm
+# Uses pre-built images from GitHub Container Registry (GHCR)
+# All values MUST be set in .env file
+#
+# USAGE:
+#   cp .env.example .env   # Edit with your values
+#   docker stack deploy -c docker-compose.yml whatsapp
+#
+# UPDATE:
+#   docker service update --image ghcr.io/mygads/genfity-wa:latest whatsapp_whatsapp-api
+#
+# ===================================================================================
+
+services:
+  whatsapp-api:
+    image: ghcr.io/mygads/genfity-wa:${IMAGE_TAG}
+    environment:
+      # Database
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_SSLMODE: ${DB_SSLMODE}
+      
+      # Application
+      PORT: ${PORT}
+      TZ: ${TZ}
+      GIN_MODE: ${GIN_MODE}
+      LOG_LEVEL: ${LOG_LEVEL}
+      
+      # Authentication
+      WA_ADMIN_TOKEN: ${WA_ADMIN_TOKEN}
+      
+      # Security / Encryption
+      WA_GLOBAL_ENCRYPTION_KEY: ${WA_GLOBAL_ENCRYPTION_KEY:-}
+      WA_GLOBAL_HMAC_KEY: ${WA_GLOBAL_HMAC_KEY:-}
+      
+      # Webhook
+      WA_GLOBAL_WEBHOOK: ${WA_GLOBAL_WEBHOOK:-}
+      WEBHOOK_FORMAT: ${WEBHOOK_FORMAT}
+      
+      # Session
+      SESSION_DEVICE_NAME: ${SESSION_DEVICE_NAME}
+      
+      # RabbitMQ (Optional)
+      RABBITMQ_URL: ${RABBITMQ_URL:-}
+      RABBITMQ_QUEUE: ${RABBITMQ_QUEUE:-}
+      
+      # Webhook Retry (Optional)
+      WEBHOOK_RETRY_ENABLED: ${WEBHOOK_RETRY_ENABLED:-}
+      WEBHOOK_RETRY_COUNT: ${WEBHOOK_RETRY_COUNT:-}
+      WEBHOOK_RETRY_DELAY_SECONDS: ${WEBHOOK_RETRY_DELAY_SECONDS:-}
+      WEBHOOK_ERROR_QUEUE_NAME: ${WEBHOOK_ERROR_QUEUE_NAME:-}
+    volumes:
+      - wa-sessions:/app/sessions
+      - wa-static:/app/static
+    networks:
+      - wa-network
+      - infra-network
+    deploy:
+      mode: replicated
+      replicas: 1  # WhatsApp session biasanya 1 device saja
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+        order: stop-first  # Stop-first karena session WA harus exclusive
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.wa-api.rule=Host(`api-wa.govconnect.my.id`) || Host(`wa-api.govconnect.my.id`)"
+        - "traefik.http.routers.wa-api.entrypoints=websecure"
+        - "traefik.http.routers.wa-api.tls.certresolver=letsencrypt"
+        - "traefik.http.services.wa-api.loadbalancer.server.port=8080"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+# ===================================================================================
+# NETWORKS
+# ===================================================================================
+networks:
+  wa-network:
+    external: true
+    name: wa-network
+  infra-network:
+    external: true
+    name: infra-network
+
+# ===================================================================================
+# VOLUMES
+# ===================================================================================
+volumes:
+  wa-sessions:
+    driver: local
+  wa-static:
+    driver: local
