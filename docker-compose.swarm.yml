@@ -87,7 +87,7 @@ services:
           memory: 256M
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.wa-api.rule=Host(`api-wa.govconnect.my.id`) || Host(`wa-api.govconnect.my.id`)"
+        - "traefik.http.routers.wa-api.rule=Host(`wa.genfity.com`)"
         - "traefik.http.routers.wa-api.entrypoints=websecure"
         - "traefik.http.routers.wa-api.tls.certresolver=letsencrypt"
         - "traefik.http.services.wa-api.loadbalancer.server.port=8080"
