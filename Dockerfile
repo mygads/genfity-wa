@@ -45,7 +45,6 @@ WORKDIR /app
 
 COPY --from=builder /app/wa             /app/
 COPY --from=builder /app/static         /app/static/
-COPY --from=builder /app/wa.service     /app/wa.service
 
 RUN chmod +x /app/wa && \
     chmod -R 755 /app && \
