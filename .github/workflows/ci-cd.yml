@@ -143,14 +143,14 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to Docker Swarm
+      - name: Deploy with Docker Compose
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}
         run: |
           echo "🚀 Deploying WhatsApp API to VPS..."
           
-          # Deploy with Docker Swarm
+          # Deploy with Docker Compose
           ssh $VPS_USER@$VPS_HOST << 'ENDSSH'
             cd /opt/apps/whatsapp-api
             
@@ -160,8 +160,8 @@ jobs:
             # Pull latest image
             docker pull ghcr.io/${{ env.IMAGE_NAME }}:latest
             
-            # Deploy/Update stack
-            docker stack deploy -c docker-compose.swarm.yml whatsapp --with-registry-auth
+            # Restart with new image
+            docker compose up -d --force-recreate
             
             echo "✅ Deployment complete!"
           ENDSSH
@@ -178,7 +178,7 @@ jobs:
             for i in {1..5}; do
               if curl -sf http://localhost:8080/health > /dev/null; then
                 echo "✅ Health check passed!"
-                docker service ls | grep whatsapp
+                docker ps | grep wa-api
                 exit 0
               fi
               echo "Attempt $i failed, retrying..."
@@ -186,7 +186,7 @@ jobs:
             done
             
             echo "❌ Health check failed!"
-            docker service logs whatsapp_wa-api --tail 50 2>/dev/null || true
+            docker logs wa-api --tail 50
             exit 1
           ENDSSH
 
