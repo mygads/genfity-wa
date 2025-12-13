@@ -17,7 +17,7 @@
 
 services:
   whatsapp-api:
-    image: ghcr.io/mygads/genfity-wa:${IMAGE_TAG}
+    image: ghcr.io/mygads/genfity-wa:${IMAGE_TAG:-latest}
     environment:
       # Database
       DB_HOST: ${DB_HOST}
