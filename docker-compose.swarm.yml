@@ -85,12 +85,6 @@ services:
         reservations:
           cpus: '0.1'
           memory: 128M
-      labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.wa-api.rule=Host(`wa.genfity.com`)"
-        - "traefik.http.routers.wa-api.entrypoints=websecure"
-        - "traefik.http.routers.wa-api.tls.certresolver=letsencrypt"
-        - "traefik.http.services.wa-api.loadbalancer.server.port=8080"
     healthcheck:
       test: ["CMD", "wget", "-q", "-O-", "http://0.0.0.0:8080/health"]
       interval: 30s

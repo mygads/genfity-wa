@@ -71,17 +71,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-    labels:
-      # Traefik
-      - "traefik.enable=true"
-      - "traefik.http.routers.wa-api.rule=Host(`api-wa.genfity.com`)"
-      - "traefik.http.routers.wa-api.entrypoints=websecure"
-      - "traefik.http.routers.wa-api.tls.certresolver=letsencrypt"
-      - "traefik.http.services.wa-api.loadbalancer.server.port=8080"
-      - "traefik.http.routers.wa-api.middlewares=wa-api-cors"
-      - "traefik.http.middlewares.wa-api-cors.headers.accessControlAllowOriginList=https://genfity.com,https://www.genfity.com"
-      - "traefik.http.middlewares.wa-api-cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,OPTIONS"
-      - "traefik.http.middlewares.wa-api-cors.headers.accessControlAllowHeaders=Content-Type,Authorization"
 
 networks:
   wa-network:
