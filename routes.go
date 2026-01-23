@@ -49,10 +49,12 @@ func (s *server) routes() {
 
 	// Health check endpoint - support both GET and HEAD methods for Docker healthcheck
 	s.router.Handle("/health", s.GetHealth()).Methods("GET", "HEAD")
+
 	adminRoutes := s.router.PathPrefix("/admin").Subrouter()
 	adminRoutes.Use(s.authadmin)
 	adminRoutes.Handle("/users", s.ListUsers()).Methods("GET")
-	adminRoutes.Handle("/users/{id}", s.ListUsers()).Methods("GET")	adminRoutes.Handle("/users", s.AddUser()).Methods("POST")
+	adminRoutes.Handle("/users/{id}", s.ListUsers()).Methods("GET")
+	adminRoutes.Handle("/users", s.AddUser()).Methods("POST")
 	adminRoutes.Handle("/users/{id}", s.EditUser()).Methods("PUT")
 	adminRoutes.Handle("/users/{id}", s.DeleteUser()).Methods("DELETE")
 	adminRoutes.Handle("/users/{id}/full", s.DeleteUserComplete()).Methods("DELETE")
