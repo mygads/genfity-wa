@@ -840,13 +840,13 @@ func (s *server) GetStatus() http.HandlerFunc {
 func (s *server) SendDocument() http.HandlerFunc {
 
 	type documentStruct struct {
-		Caption     string
-		Phone       string
-		Document    string
-		FileName    string
-		Id          string
-		MimeType    string
-		ContextInfo waE2E.ContextInfo
+		Caption       string
+		Phone         string
+		Document      string
+		FileName      string
+		Id            string
+		MimeType      string
+		ContextInfo   waE2E.ContextInfo
 		QuotedMessage *waE2E.Message `json:"QuotedMessage,omitempty"`
 	}
 
@@ -999,15 +999,15 @@ func (s *server) SendDocument() http.HandlerFunc {
 func (s *server) SendAudio() http.HandlerFunc {
 
 	type audioStruct struct {
-		Phone       string
-		Audio       string
-		Caption     string
-		Id          string
-		PTT         *bool  `json:"ptt,omitempty"`
-		MimeType    string `json:"mimetype,omitempty"`
-		Seconds     uint32
-		Waveform    []byte
-		ContextInfo waE2E.ContextInfo
+		Phone         string
+		Audio         string
+		Caption       string
+		Id            string
+		PTT           *bool  `json:"ptt,omitempty"`
+		MimeType      string `json:"mimetype,omitempty"`
+		Seconds       uint32
+		Waveform      []byte
+		ContextInfo   waE2E.ContextInfo
 		QuotedMessage *waE2E.Message `json:"QuotedMessage,omitempty"`
 	}
 
@@ -1697,11 +1697,11 @@ func (s *server) SendVideo() http.HandlerFunc {
 func (s *server) SendContact() http.HandlerFunc {
 
 	type contactStruct struct {
-		Phone       string
-		Id          string
-		Name        string
-		Vcard       string
-		ContextInfo waE2E.ContextInfo
+		Phone         string
+		Id            string
+		Name          string
+		Vcard         string
+		ContextInfo   waE2E.ContextInfo
 		QuotedMessage *waE2E.Message `json:"QuotedMessage,omitempty"`
 	}
 
@@ -1818,12 +1818,12 @@ func (s *server) SendContact() http.HandlerFunc {
 func (s *server) SendLocation() http.HandlerFunc {
 
 	type locationStruct struct {
-		Phone       string
-		Id          string
-		Name        string
-		Latitude    float64
-		Longitude   float64
-		ContextInfo waE2E.ContextInfo
+		Phone         string
+		Id            string
+		Name          string
+		Latitude      float64
+		Longitude     float64
+		ContextInfo   waE2E.ContextInfo
 		QuotedMessage *waE2E.Message `json:"QuotedMessage,omitempty"`
 	}
 
@@ -2262,8 +2262,8 @@ func (s *server) SendMessage() http.HandlerFunc {
 		LinkPreview   bool
 		Id            string
 		ContextInfo   waE2E.ContextInfo
-		QuotedText    string          `json:"QuotedText,omitempty"`
-		QuotedMessage *waE2E.Message  `json:"QuotedMessage,omitempty"`
+		QuotedText    string         `json:"QuotedText,omitempty"`
+		QuotedMessage *waE2E.Message `json:"QuotedMessage,omitempty"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		txtid := r.Context().Value("userinfo").(Values).Get("Id")
