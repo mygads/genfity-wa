@@ -1,81 +1,47 @@
 # ===================================================================================
-# WHATSAPP API (GENFITY-WA) - DOCKER COMPOSE (LOCAL DEVELOPMENT)
+# WHATSAPP API (GENFITY-WA) - DOCKER COMPOSE
 # ===================================================================================
-# 
-# Builds images locally from source code
-# All values MUST be set in .env file
+#
+# Single docker-compose for production deployment.
+# For development, use: go run .
 #
 # USAGE:
-#   cp .env.example .env   # Edit with your values
-#   docker compose up -d --build
+#   Local test:  docker compose up -d --build
+#   CI/CD:       IMAGE=ghcr.io/mygads/genfity-wa:latest docker compose up -d --pull always
 #
 # ===================================================================================
 
 services:
-  whatsapp-api:
+  wa-api:
+    image: ${IMAGE:-genfity-wa:local}
     build:
       context: .
       dockerfile: Dockerfile
-    image: genfity-wa:local
     container_name: wa-api
     ports:
-      - "8080:8080"
-    environment:
-      # Database
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DB_NAME}
-      DB_SSLMODE: ${DB_SSLMODE}
-      
-      # Application
-      PORT: ${PORT}
-      TZ: ${TZ}
-      GIN_MODE: ${GIN_MODE}
-      LOG_LEVEL: ${LOG_LEVEL}
-      
-      # Authentication
-      WA_ADMIN_TOKEN: ${WA_ADMIN_TOKEN}
-      
-      # Security / Encryption
-      WA_GLOBAL_ENCRYPTION_KEY: ${WA_GLOBAL_ENCRYPTION_KEY:-}
-      WA_GLOBAL_HMAC_KEY: ${WA_GLOBAL_HMAC_KEY:-}
-      
-      # Webhook
-      WA_GLOBAL_WEBHOOK: ${WA_GLOBAL_WEBHOOK:-}
-      WEBHOOK_FORMAT: ${WEBHOOK_FORMAT}
-      
-      # Session
-      SESSION_DEVICE_NAME: ${SESSION_DEVICE_NAME}
-      
-      # RabbitMQ (Optional)
-      RABBITMQ_URL: ${RABBITMQ_URL:-}
-      RABBITMQ_QUEUE: ${RABBITMQ_QUEUE:-}
-      
-      # Webhook Retry (Optional)
-      WEBHOOK_RETRY_ENABLED: ${WEBHOOK_RETRY_ENABLED:-}
-      WEBHOOK_RETRY_COUNT: ${WEBHOOK_RETRY_COUNT:-}
-      WEBHOOK_RETRY_DELAY_SECONDS: ${WEBHOOK_RETRY_DELAY_SECONDS:-}
-      WEBHOOK_ERROR_QUEUE_NAME: ${WEBHOOK_ERROR_QUEUE_NAME:-}
+      - "127.0.0.1:8080:8080"
+    env_file:
+      - .env
     volumes:
       - wa-sessions:/app/sessions
       - wa-static:/app/static
     networks:
-      - wa-network
+      - genfity-network
       - infra-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O-", "http://0.0.0.0:8080/health"]
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost:8080/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
 
 networks:
-  wa-network:
+  genfity-network:
     external: true
-    name: wa-network
+    name: genfity-network
   infra-network:
     external: true
     name: infra-network
